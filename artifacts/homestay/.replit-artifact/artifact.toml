@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Neel Kamal Homestay"
+version = "1.0.0"
+id = "artifacts/homestay"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25820
+
+[services.development]
+run = "pnpm --filter @workspace/homestay run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/homestay", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/homestay/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25820"
+BASE_PATH = "/"

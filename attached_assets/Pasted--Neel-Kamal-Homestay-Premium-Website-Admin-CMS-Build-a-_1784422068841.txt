@@ -1,0 +1,571 @@
+🏔️ Neel Kamal Homestay - Premium Website + Admin CMS
+
+Build a premium, modern, minimal, responsive boutique homestay website for Neel Kamal Homestay, located in Village Mashobra, Old Parwanoo Road, Kasauli, District Solan, Himachal Pradesh, India.
+
+The website should feel like a luxury mountain retreat similar to Airbnb Luxe, Aman Resorts, Apple, and boutique Himalayan stays.
+
+The design must be elegant, spacious, premium, minimal, and focused on large photography with lots of whitespace.
+
+Tech Stack
+
+Use
+
+React
+TypeScript
+Tailwind CSS
+Supabase
+Framer Motion (very subtle animations only)
+Responsive Design
+SEO Optimized
+Image Optimization
+Dark Mode & Light Mode
+IMPORTANT
+
+Do NOT hardcode any images.
+
+I do NOT have all room images yet.
+
+I will upload them later from the Admin Dashboard.
+
+The website must be completely functional even if no images exist.
+
+Whenever images are uploaded later, the website should automatically display them.
+
+No code changes.
+
+No redeployment.
+
+Design Style
+
+Premium
+
+Minimal
+
+Boutique
+
+Mountain Retreat
+
+Luxury Cabin
+
+Elegant
+
+Large Photography
+
+Clean Typography
+
+Lots of White Space
+
+No chunky cards.
+
+No flashy gradients.
+
+No excessive animations.
+
+Color Palette
+
+Forest Green
+
+Charcoal Black
+
+Warm Beige
+
+Off White
+
+Natural Wood
+
+Slate Grey
+
+Typography
+
+Luxury serif headings.
+
+Modern sans-serif body text.
+
+Large headings.
+
+Thin elegant buttons.
+
+Rounded corners.
+
+Pages
+Home
+Rooms
+Gallery
+Amenities
+Nearby Attractions
+About
+Contact
+Book Now
+Homepage Hero
+
+Large full-screen hero.
+
+If no hero image exists
+
+Display an elegant premium mountain placeholder background with subtle dark overlay.
+
+Later I will upload the real building image from Admin Dashboard.
+
+Hero should update automatically.
+
+Hero contains
+
+Logo
+
+Navigation
+
+Headline
+
+Subheadline
+
+Book Now button
+
+Explore Rooms button
+
+Hero information chips
+
+Display beautiful glass cards
+
+📍 Heritage Market
+
+1.5 km
+
+~10 min
+
+⛪ Christ Church
+
+1.5 km
+
+~10 min
+
+🐒 Manki Point
+
+~13 min
+
+🏔 Mountain View
+
+📶 Free WiFi
+
+🚗 Free Parking
+
+Floating Contact Buttons
+
+WhatsApp
+
+Call
+
+Google Maps
+
+Always visible.
+
+About Section
+
+Split Layout
+
+Large Image
+
+Luxury Typography
+
+Mountain Story
+
+Amenities
+
+Modern icon cards
+
+Mountain View
+
+Free WiFi
+
+Parking
+
+24×7 Hot Water
+
+Room Service
+
+CCTV
+
+Balcony
+
+Valley View
+
+Family Friendly
+
+Rooms
+
+Create
+
+Suite Family Room
+
+Deluxe Room 1
+
+Deluxe Room 2
+
+If room images don't exist
+
+Show elegant placeholder.
+
+Display
+
+Photos Coming Soon
+
+Everything else should still work.
+
+Each room contains
+
+Description
+
+Amenities
+
+Gallery
+
+Maximum Guests
+
+Book Button
+
+View Details
+
+Gallery
+
+Pinterest masonry gallery.
+
+Initially empty.
+
+If no images
+
+Display
+
+Gallery Coming Soon
+
+Later
+
+Whenever images are uploaded
+
+Automatically populate gallery.
+
+Nearby Attractions
+
+Display
+
+Heritage Market
+
+1.5 km
+
+~10 min
+
+Christ Church
+
+1.5 km
+
+~10 min
+
+Manki Point
+
+~13 min
+
+Gilbert Trail
+
+Mall Road
+
+Sunset Point
+
+Google Maps Button
+
+Booking
+
+Modern booking form
+
+Name
+
+Phone
+
+Guests
+
+Room
+
+Check In
+
+Check Out
+
+Special Request
+
+Submit
+
+Generate WhatsApp booking enquiry.
+
+ADMIN DASHBOARD
+
+Simple Login
+
+Sidebar
+
+🏠 Dashboard
+
+🛏 Rooms
+
+🖼 Property Gallery
+
+📂 Media Library
+
+📅 Bookings
+
+📍 Nearby Attractions
+
+⭐ Reviews
+
+📞 Contact
+
+⚙ Website Settings
+
+EVERYTHING MUST BE EDITABLE
+
+Nothing should be hardcoded except layout.
+
+Admin should be able to edit
+
+Hero Image
+
+Hero Text
+
+Buttons
+
+Gallery
+
+Room Photos
+
+Room Description
+
+Amenities
+
+Nearby Attractions
+
+Footer
+
+Logo
+
+Website Name
+
+Colors
+
+Contact Details
+
+Google Maps
+
+Check-in
+
+Check-out
+
+Policies
+
+Everything.
+
+Property Gallery
+
+Functions
+
+Upload
+
+Replace
+
+Delete
+
+Rename
+
+Hide
+
+Reorder
+
+Feature Image
+
+Room Gallery
+
+Upload
+
+Replace
+
+Delete
+
+Unlimited Images
+
+Drag & Drop
+
+Choose Cover Image
+
+Media Library
+
+Every uploaded image goes here.
+
+Features
+
+Upload
+
+Delete
+
+Rename
+
+Search
+
+Filter
+
+Preview
+
+Image Size
+
+Image Used In
+
+Use As Hero
+
+Use As Gallery
+
+Use As Room
+
+Use As About Image
+
+Use As Footer
+
+Reuse images.
+
+Do not duplicate uploads.
+
+Image Selection
+
+Whenever multiple images are selected
+
+Display
+
+Blue Border
+
+Checkmark
+
+Top Right
+
+Counter
+
+Example
+
+12 Images Selected
+
+Similar to Google Photos.
+
+Toggle System
+
+Everything should have ON/OFF switches.
+
+Examples
+
+Room Available
+
+Gallery Visible
+
+Amenities Visible
+
+Homepage Section Visible
+
+Nearby Attraction Visible
+
+Review Visible
+
+Hero Visible
+
+No deleting required.
+
+Booking Availability
+
+Every room should have
+
+Available
+
+Unavailable
+
+Toggle Switch
+
+When OFF
+
+Display
+
+Currently Unavailable
+
+Disable Book Button
+
+Grey Overlay
+
+Dashboard Analytics
+
+Today's Visitors
+
+Pending Bookings
+
+Available Rooms
+
+Booked Rooms
+
+Popular Room
+
+Total Gallery Images
+
+Image Optimization
+
+Automatically
+
+Compress
+
+Resize
+
+Convert to WebP
+
+Generate Mobile Version
+
+Lazy Load
+
+Maintain Quality
+
+Draft Mode
+
+Admin edits should NOT go live immediately.
+
+Save everything as Draft.
+
+Include a large
+
+🚀 Publish Changes
+
+button.
+
+Only after clicking Publish should changes appear on the live website.
+
+Live Updates
+
+Once published
+
+Everything updates instantly.
+
+No rebuilding.
+
+No redeploying.
+
+No coding.
+
+Performance
+
+SEO
+
+Responsive
+
+Accessibility
+
+Fast Loading
+
+Lazy Loading
+
+Image Optimization
+
+Reusable Components
+
+Final Goal
+
+The finished website should look like a premium ₹12,000–₹15,000/night boutique mountain retreat—not a basic homestay website. It should feel elegant, luxurious, trustworthy, and modern while remaining extremely easy to manage.
+
+After deployment, I should never need to open Replit again for content updates. Every photo, hero image, room gallery, text, amenities, availability, nearby attractions, and contact detail must be editable from the Admin Dashboard with a professional CMS experience.
+
+🚀 One final instruction for Replit AI
+
+Do not use placeholder stock photos from the internet. Build the website with elegant empty states and placeholders. I will upload all real property and room images later through the Admin Dashboard. The website must be designed from day one to support dynamic image uploads without requiring any code changes or redeployment.

@@ -1,0 +1,240 @@
+import React from 'react';
+import { useGetSettings, useListRooms, useListReviews } from '@workspace/api-client-react';
+import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function Home() {
+  const { data: settings } = useGetSettings();
+  const { data: rooms } = useListRooms();
+  const { data: reviews } = useListReviews();
+
+  const visibleRooms = rooms?.filter(r => r.isVisible) || [];
+  const visibleReviews = reviews?.filter(r => r.isVisible) || [];
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        {settings?.heroImageUrl ? (
+          <div 
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${settings.heroImageUrl})` }}
+          />
+        ) : (
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/20 to-background flex items-end justify-center">
+            {/* Elegant mountain silhouette placeholder */}
+            <svg viewBox="0 0 1440 320" className="w-full h-auto text-primary/10 fill-current opacity-50" preserveAspectRatio="none">
+              <path d="M0,320 L1440,320 L1440,160 C1200,200 1000,100 800,180 C600,260 400,120 0,220 Z"></path>
+              <path d="M0,320 L1440,320 L1440,240 C1100,280 900,180 700,260 C500,340 200,200 0,300 Z" className="text-primary/20"></path>
+            </svg>
+          </div>
+        )}
+        <div className="absolute inset-0 z-10 bg-black/40" />
+        
+        <div className="relative z-20 text-center px-4 max-w-4xl mx-auto mt-20">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight"
+          >
+            {settings?.heroHeading || 'Silence in the High Himalayas'}
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-white/90 mb-10 font-light tracking-wide"
+          >
+            {settings?.heroSubheading || 'A bespoke sanctuary above the clouds.'}
+          </motion.p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link href="/book" className="px-8 py-3 bg-white text-primary rounded-sm font-medium tracking-wide hover:bg-white/90 transition-colors w-full sm:w-auto">
+              Book Your Stay
+            </Link>
+            <Link href="/rooms" className="px-8 py-3 border border-white text-white rounded-sm font-medium tracking-wide hover:bg-white/10 transition-colors w-full sm:w-auto">
+              Explore Rooms
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Info Chips */}
+        <div className="absolute bottom-8 left-0 w-full z-20 px-4">
+          <div className="container mx-auto flex flex-wrap justify-center gap-3">
+            {[
+              { icon: MapPin, text: 'Heritage Market (1.5km)' },
+              { icon: MapPin, text: 'Christ Church (1.5km)' },
+              { icon: Wind, text: 'Mountain View' },
+              { icon: Wifi, text: 'Free WiFi' },
+              { icon: Car, text: 'Free Parking' },
+            ].map((chip, i) => (
+              <div key={i} className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
+                <chip.icon className="w-4 h-4" />
+                <span>{chip.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="relative aspect-[4/5] rounded-sm overflow-hidden bg-muted">
+              {settings?.aboutImageUrl ? (
+                <img src={settings.aboutImageUrl} alt="About Neel Kamal" className="object-cover w-full h-full" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                  <Wind className="w-24 h-24 opacity-20" />
+                </div>
+              )}
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-5xl font-serif text-primary mb-6">
+                {settings?.aboutHeading || 'A Home Above the World'}
+              </h2>
+              <div className="text-foreground/80 space-y-6 leading-relaxed text-lg">
+                <p>{settings?.aboutText || 'Discover a space where time slows down. Handcrafted wooden interiors, panoramic valley views, and the crisp mountain air create an atmosphere of profound peace.'}</p>
+              </div>
+              <div className="mt-10">
+                <Link href="/about" className="inline-flex items-center text-primary font-medium tracking-wide uppercase text-sm group">
+                  Read Our Story 
+                  <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Amenities Strip */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h3 className="text-sm tracking-[0.2em] uppercase text-primary mb-12">Curated Comforts</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { icon: Wind, label: 'Valley View' },
+              { icon: Wifi, label: 'High-Speed WiFi' },
+              { icon: Car, label: 'Private Parking' },
+              { icon: Coffee, label: 'Room Service' },
+            ].map((amenity, i) => (
+              <div key={i} className="flex flex-col items-center justify-center gap-4 p-6 bg-card rounded-sm shadow-sm border border-border">
+                <amenity.icon className="w-8 h-8 text-primary/70" />
+                <span className="font-medium text-foreground">{amenity.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12">
+            <Link href="/amenities" className="text-primary font-medium text-sm uppercase tracking-wide hover:underline">
+              View All Amenities
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Rooms Preview */}
+      <section className="py-24 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-serif text-primary mb-4">Our Rooms</h2>
+              <p className="text-foreground/70">Spaces designed for rest and reflection.</p>
+            </div>
+            <Link href="/rooms" className="hidden md:inline-flex px-6 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-sm transition-colors uppercase text-xs tracking-wider font-medium">
+              View All
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {visibleRooms.slice(0, 3).map((room) => (
+              <Link key={room.id} href={`/rooms/${room.slug}`} className="group block relative rounded-sm overflow-hidden bg-card border border-border transition-shadow hover:shadow-md">
+                <div className="aspect-[4/3] bg-muted relative overflow-hidden">
+                  {room.coverImageUrl ? (
+                    <img src={room.coverImageUrl} alt={room.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50">
+                      <Wind className="w-12 h-12 mb-2" />
+                      <span className="text-xs uppercase tracking-wider">Photos Coming Soon</span>
+                    </div>
+                  )}
+                  {!room.isAvailable && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-10">
+                      <span className="bg-white text-black px-4 py-2 text-sm uppercase tracking-widest font-medium rounded-sm">Currently Unavailable</span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-serif text-primary">{room.name}</h3>
+                    {room.pricePerNight && (
+                      <span className="text-sm font-medium text-foreground">₹{room.pricePerNight} <span className="text-xs text-muted-foreground font-normal">/ night</span></span>
+                    )}
+                  </div>
+                  <p className="text-foreground/70 text-sm mb-4 line-clamp-2">{room.shortDescription}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs bg-muted px-2 py-1 rounded-sm text-foreground/80">{room.maxGuests} Guests</span>
+                    <span className="text-xs bg-muted px-2 py-1 rounded-sm text-foreground/80">{room.bedType}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {visibleRooms.length === 0 && (
+              <div className="col-span-3 text-center py-12 text-muted-foreground border border-dashed border-border rounded-sm">
+                Rooms are being prepared. Check back soon.
+              </div>
+            )}
+          </div>
+          <div className="mt-8 text-center md:hidden">
+            <Link href="/rooms" className="inline-flex px-6 py-3 border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-sm transition-colors uppercase text-sm tracking-wider font-medium w-full justify-center">
+              View All Rooms
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews Preview */}
+      {visibleReviews.length > 0 && (
+        <section className="py-24 bg-muted/50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-serif text-primary mb-12">Guest Experiences</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {visibleReviews.slice(0, 3).map((review) => (
+                <div key={review.id} className="bg-card p-8 rounded-sm shadow-sm border border-border text-left flex flex-col h-full">
+                  <div className="flex gap-1 mb-4 text-accent">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-muted-foreground/30'}`} />
+                    ))}
+                  </div>
+                  <p className="text-foreground/80 italic flex-1 mb-6">"{review.reviewText}"</p>
+                  <div>
+                    <p className="font-medium text-primary">{review.guestName}</p>
+                    {review.source && <p className="text-xs text-muted-foreground mt-1">via {review.source}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="py-24 bg-primary text-primary-foreground text-center">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <h2 className="text-3xl md:text-5xl font-serif mb-6">Ready for a mountain escape?</h2>
+          <p className="text-primary-foreground/80 mb-10 text-lg">Leave the noise behind. Your sanctuary awaits.</p>
+          <Link href="/book" className="inline-block px-10 py-4 bg-background text-primary rounded-sm font-medium tracking-wide hover:bg-background/90 transition-colors uppercase text-sm">
+            Book Your Stay
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
