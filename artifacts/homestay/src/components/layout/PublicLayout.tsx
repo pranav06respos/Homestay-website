@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { useGetSettings } from '@workspace/api-client-react';
-import { Menu, X, Phone, MapPin, MessageCircle } from 'lucide-react';
+import { Menu, X, Phone, MapPin, MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -154,42 +155,71 @@ export function Footer() {
 
 export function FloatingContact() {
   const { data: settings } = useGetSettings();
+  const [open, setOpen] = React.useState(false);
+  const hasActions = settings?.googleMapsUrl || settings?.contactPhone || settings?.contactWhatsapp;
+  if (!hasActions) return null;
+
+  const actions = [
+    ...(settings?.contactWhatsapp ? [{
+      label: 'WhatsApp',
+      icon: MessageCircle,
+      href: `https://wa.me/${settings.contactWhatsapp.replace(/\D/g, '')}`,
+      external: true,
+      color: 'bg-green-600 text-white hover:bg-green-700',
+    }] : []),
+    ...(settings?.contactPhone ? [{
+      label: 'Call',
+      icon: Phone,
+      href: `tel:${settings.contactPhone}`,
+      external: false,
+      color: 'bg-blue-600 text-white hover:bg-blue-700',
+    }] : []),
+    ...(settings?.googleMapsUrl ? [{
+      label: 'Location',
+      icon: MapPin,
+      href: settings.googleMapsUrl,
+      external: true,
+      color: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    }] : []),
+  ].reverse();
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
-      {settings?.googleMapsUrl && (
-        <a 
-          href={settings.googleMapsUrl} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="bg-destructive text-destructive-foreground p-3 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
-          title="Directions"
-        >
-          <MapPin className="w-6 h-6" />
-        </a>
-      )}
-      
-      {settings?.contactPhone && (
-        <a 
-          href={`tel:${settings.contactPhone}`} 
-          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
-          title="Call Us"
-        >
-          <Phone className="w-6 h-6" />
-        </a>
-      )}
-      
-      {settings?.contactWhatsapp && (
-        <a 
-          href={`https://wa.me/${settings.contactWhatsapp.replace(/\D/g,'')}`} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="bg-green-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
-          title="WhatsApp Us"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </a>
-      )}
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 flex flex-col items-end gap-2">
+      {/* Expanded actions */}
+      <div className={cn("flex flex-col items-end gap-2 transition-all duration-300", open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none")}>
+        {actions.map((action) => (
+          <div key={action.label} className="flex items-center gap-2">
+            <span className="text-xs font-medium text-foreground bg-background/95 backdrop-blur-sm px-2 py-1 rounded-sm shadow-sm border border-border">
+              {action.label}
+            </span>
+            <a
+              href={action.href}
+              target={action.external ? "_blank" : undefined}
+              rel={action.external ? "noopener noreferrer" : undefined}
+              onClick={() => setOpen(false)}
+              className={cn(
+                "w-11 h-11 md:w-14 md:h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95",
+                action.color
+              )}
+              aria-label={action.label}
+            >
+              <action.icon className="w-5 h-5 md:w-6 md:h-6" />
+            </a>
+          </div>
+        ))}
+      </div>
+
+      {/* Main toggle button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95",
+          open ? "bg-primary text-primary-foreground rotate-45" : "bg-primary text-primary-foreground"
+        )}
+        aria-label={open ? "Close contact options" : "Open contact options"}
+      >
+        <Plus className="w-6 h-6 md:w-7 md:h-7" />
+      </button>
     </div>
   );
 }

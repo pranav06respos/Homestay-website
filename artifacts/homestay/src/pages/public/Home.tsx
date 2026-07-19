@@ -2,7 +2,7 @@ import React from 'react';
 import { useGetSettings, useListRooms, useListReviews } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star } from 'lucide-react';
+import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star, Church, Mountain, Trees } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Home() {
@@ -16,12 +16,17 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[88vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden">
         {settings?.heroImageUrl ? (
-          <div 
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${settings.heroImageUrl})` }}
-          />
+          <picture className="absolute inset-0 z-0">
+            <img
+              src={settings.heroImageUrl}
+              alt={settings?.heroHeading || 'Neel Kamal Homestay'}
+              className="w-full h-full object-cover object-left md:object-center"
+              loading="eager"
+              decoding="async"
+            />
+          </picture>
         ) : (
           <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/20 to-background flex items-end justify-center">
             {/* Elegant mountain silhouette placeholder */}
@@ -31,55 +36,64 @@ export default function Home() {
             </svg>
           </div>
         )}
-        <div className="absolute inset-0 z-10 bg-black/40" />
-        
-        <div className="relative z-20 text-center px-4 max-w-4xl mx-auto mt-20">
-          <motion.h1 
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
+
+        <div className="relative z-20 text-center px-4 sm:px-6 max-w-4xl mx-auto mt-24 md:mt-20 pb-32 md:pb-0">
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight"
+            className="text-[2.1rem] leading-[1.15] sm:text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-4 md:mb-6"
           >
             {settings?.heroHeading || 'Silence in the High Himalayas'}
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/90 mb-10 font-light tracking-wide"
+            className="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-10 font-light tracking-wide max-w-2xl mx-auto"
           >
             {settings?.heroSubheading || 'A bespoke sanctuary above the clouds.'}
           </motion.p>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4"
           >
-            <Link href="/book" className="px-8 py-3 bg-white text-primary rounded-sm font-medium tracking-wide hover:bg-white/90 transition-colors w-full sm:w-auto">
+            <Link href="/book" className="px-6 md:px-8 py-2.5 md:py-3 bg-white text-primary rounded-sm font-medium tracking-wide hover:bg-white/90 transition-colors w-full sm:w-auto">
               Book Your Stay
             </Link>
-            <Link href="/rooms" className="px-8 py-3 border border-white text-white rounded-sm font-medium tracking-wide hover:bg-white/10 transition-colors w-full sm:w-auto">
+            <Link href="/rooms" className="px-6 md:px-8 py-2.5 md:py-3 border border-white text-white rounded-sm font-medium tracking-wide hover:bg-white/10 transition-colors w-full sm:w-auto">
               Explore Rooms
             </Link>
           </motion.div>
         </div>
 
-        {/* Info Chips */}
-        <div className="absolute bottom-8 left-0 w-full z-20 px-4">
-          <div className="container mx-auto flex flex-wrap justify-center gap-3">
-            {[
-              { icon: MapPin, text: 'Heritage Market (1.5km)' },
-              { icon: MapPin, text: 'Christ Church (1.5km)' },
-              { icon: Wind, text: 'Mountain View' },
-              { icon: Wifi, text: 'Free WiFi' },
-              { icon: Car, text: 'Free Parking' },
-            ].map((chip, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
-                <chip.icon className="w-4 h-4" />
-                <span>{chip.text}</span>
-              </div>
-            ))}
+        {/* Nearby Location Cards (mobile-friendly) */}
+        <div className="absolute bottom-6 md:bottom-8 left-0 w-full z-20 px-4 sm:px-6">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto">
+              {[
+                { icon: MapPin, title: 'Heritage Market', meta: '1.5 km • ~10 min' },
+                { icon: Church, title: 'Christ Church', meta: '1.5 km • ~10 min' },
+                { icon: Mountain, title: 'Manki Point', meta: '~13 min' },
+                { icon: Trees, title: 'Gilbert Trail', meta: '~15 min' },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2.5 md:gap-3 p-2.5 md:p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-sm text-white"
+                >
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 md:w-5 md:h-5 text-white/90" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs md:text-sm font-medium truncate">{item.title}</p>
+                    <p className="text-[10px] md:text-xs text-white/70">{item.meta}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
