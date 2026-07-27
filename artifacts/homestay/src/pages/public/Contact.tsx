@@ -37,9 +37,21 @@ export default function Contact() {
                   <Phone className="w-6 h-6 text-primary mt-1 mr-4" />
                   <div>
                     <h4 className="font-medium text-foreground mb-1 uppercase tracking-widest text-xs">Phone</h4>
-                    <a href={`tel:${settings?.contactPhone}`} className="text-foreground/80 hover:text-primary transition-colors text-lg">
-                      {settings?.contactPhone || '+91 00000 00000'}
-                    </a>
+                    {settings?.contactPhone
+                      ? settings.contactPhone.split(',').map((p, i) => {
+                          const phone = p.trim();
+                          return (
+                            <a
+                              key={i}
+                              href={`tel:${phone.replace(/\s/g, '')}`}
+                              className="block text-foreground/80 hover:text-primary transition-colors text-lg"
+                            >
+                              {phone}
+                            </a>
+                          );
+                        })
+                      : <span className="text-foreground/80 text-lg">+91 00000 00000</span>
+                    }
                   </div>
                 </li>
 

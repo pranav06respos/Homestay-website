@@ -43,7 +43,7 @@ export default function MediaLibrary() {
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this file? It will be removed from all associated uses.")) {
       try {
-        await deleteMedia.mutateAsync({ params: { id } });
+        await deleteMedia.mutateAsync({ id });
         queryClient.invalidateQueries({ queryKey: ['/api/media'] });
         queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
         setSelectedIds(prev => {
@@ -190,7 +190,7 @@ function MediaPreviewDialog({ media, open, onOpenChange, onDelete }: { media: Me
   const handleSave = async () => {
     if (!media) return;
     try {
-      await updateMedia.mutateAsync({ params: { id: media.id }, data: { altText } });
+      await updateMedia.mutateAsync({ id: media.id, data: { altText } });
       queryClient.invalidateQueries({ queryKey: ['/api/media'] });
       toast({ title: "Media updated" });
       onOpenChange(false);

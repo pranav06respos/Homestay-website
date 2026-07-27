@@ -24,7 +24,7 @@ export default function Reviews() {
 
   const handleToggleVisible = async (id: number) => {
     try {
-      await toggleVisible.mutateAsync({ params: { id } });
+      await toggleVisible.mutateAsync({ id });
       queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
       toast({ title: "Visibility updated" });
     } catch {
@@ -35,7 +35,7 @@ export default function Reviews() {
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this review?")) {
       try {
-        await deleteReview.mutateAsync({ params: { id } });
+        await deleteReview.mutateAsync({ id });
         queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
         toast({ title: "Review deleted" });
       } catch {
@@ -170,7 +170,7 @@ function ReviewDialog({ item, open, onOpenChange }: { item: Review | null, open:
 
     try {
       if (item) {
-        await update.mutateAsync({ params: { id: item.id }, data: payload });
+        await update.mutateAsync({ id: item.id, data: payload });
         toast({ title: "Review updated" });
       } else {
         await create.mutateAsync({ data: payload });

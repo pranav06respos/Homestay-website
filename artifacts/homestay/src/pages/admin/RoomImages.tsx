@@ -30,7 +30,7 @@ export default function RoomImages() {
 
   const handleSetCover = async (imageId: number) => {
     try {
-      await setCover.mutateAsync({ params: { id: roomId, imageId } });
+      await setCover.mutateAsync({ id: roomId, imageId });
       queryClient.invalidateQueries({ queryKey: ['/api/rooms', roomId] });
       queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/images`] });
       queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
@@ -43,7 +43,7 @@ export default function RoomImages() {
   const handleRemove = async (imageId: number) => {
     if (confirm("Remove this image from the room?")) {
       try {
-        await removeImage.mutateAsync({ params: { id: roomId, imageId } });
+        await removeImage.mutateAsync({ id: roomId, imageId });
         queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/images`] });
         toast({ title: "Removed from room" });
       } catch {
@@ -155,7 +155,7 @@ function RoomMediaPickerDialog({ roomId, open, onOpenChange, existingMediaIds }:
   const handleAdd = async () => {
     try {
       const promises = Array.from(selectedIds).map(mediaId => 
-        addRoomImage.mutateAsync({ params: { id: roomId }, data: { mediaId, isCover: false, sortOrder: 999 } })
+        addRoomImage.mutateAsync({ id: roomId, data: { mediaId, isCover: false, sortOrder: 999 } })
       );
       
       await Promise.all(promises);

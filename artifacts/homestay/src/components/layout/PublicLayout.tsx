@@ -5,10 +5,22 @@ import { Menu, X, Phone, MapPin, MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+function useSiteNameParts(siteName?: string | null) {
+  const name = siteName || 'Neel Kamal Homestay Kasauli';
+  const idx = name.indexOf(' Homestay');
+  if (idx !== -1) {
+    return [name.slice(0, idx), name.slice(idx + 1)]; // ["Neel Kamal", "Homestay Kasauli"]
+  }
+  // Fallback: split at last space of first two words
+  const words = name.split(' ');
+  return [words.slice(0, 2).join(' '), words.slice(2).join(' ') || 'Homestay'];
+}
+
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [location] = useLocation();
   const [scrolled, setScrolled] = React.useState(false);
+  const { data: settings } = useGetSettings();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -32,14 +44,15 @@ export function Navbar() {
   const navBg = scrolled ? 'bg-background/95 backdrop-blur-sm border-b shadow-sm' : isHome ? 'bg-transparent text-white' : 'bg-background border-b';
   const linkColor = scrolled || !isHome ? 'text-foreground hover:text-primary' : 'text-white/90 hover:text-white';
   const logoColor = scrolled || !isHome ? 'text-primary' : 'text-white';
+  const [siteTop, siteBottom] = useSiteNameParts(settings?.siteName);
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${navBg}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className={`flex flex-col items-center justify-center ${logoColor}`}>
-            <span className="font-serif text-2xl tracking-wide leading-none">Neel Kamal</span>
-            <span className="text-[10px] tracking-[0.3em] font-medium opacity-80 uppercase mt-1">Homestay</span>
+            <span className="font-serif text-2xl tracking-wide leading-none">{siteTop}</span>
+            <span className="text-[10px] tracking-[0.3em] font-medium opacity-80 uppercase mt-1">{siteBottom}</span>
           </Link>
 
           {/* Desktop Menu */}
@@ -100,6 +113,7 @@ export function Navbar() {
 
 export function Footer() {
   const { data: settings } = useGetSettings();
+  const [siteTop, siteBottom] = useSiteNameParts(settings?.siteName);
 
   return (
     <footer className="bg-foreground text-background py-16">
@@ -107,8 +121,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <Link href="/" className="inline-flex flex-col items-start mb-6">
-              <span className="font-serif text-3xl tracking-wide leading-none text-background">Neel Kamal</span>
-              <span className="text-xs tracking-[0.3em] font-medium opacity-70 uppercase mt-2">Homestay</span>
+              <span className="font-serif text-3xl tracking-wide leading-none text-background">{siteTop}</span>
+              <span className="text-xs tracking-[0.3em] font-medium opacity-70 uppercase mt-2">{siteBottom}</span>
             </Link>
             <p className="text-background/70 text-sm leading-relaxed max-w-xs">
               {settings?.tagline || 'A serene high-altitude retreat for urban seekers who want to disappear into the Himalayas without sacrificing comfort.'}

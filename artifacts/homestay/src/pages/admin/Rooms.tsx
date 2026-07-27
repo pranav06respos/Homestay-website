@@ -25,7 +25,7 @@ export default function Rooms() {
 
   const handleToggleAvailable = async (id: number) => {
     try {
-      await toggleAvailable.mutateAsync({ params: { id } });
+      await toggleAvailable.mutateAsync({ id });
       queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
       toast({ title: "Availability updated" });
     } catch {
@@ -35,7 +35,7 @@ export default function Rooms() {
 
   const handleToggleVisible = async (id: number) => {
     try {
-      await toggleVisible.mutateAsync({ params: { id } });
+      await toggleVisible.mutateAsync({ id });
       queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
       toast({ title: "Visibility updated" });
     } catch {
@@ -46,7 +46,7 @@ export default function Rooms() {
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this room? This cannot be undone.")) {
       try {
-        await deleteRoom.mutateAsync({ params: { id } });
+        await deleteRoom.mutateAsync({ id });
         queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
         toast({ title: "Room deleted" });
       } catch {
@@ -225,7 +225,7 @@ function RoomDialog({ room, open, onOpenChange }: { room: Room | null, open: boo
 
     try {
       if (room) {
-        await updateRoom.mutateAsync({ params: { id: room.id }, data: payload });
+        await updateRoom.mutateAsync({ id: room.id, data: payload });
         toast({ title: "Room updated" });
       } else {
         await createRoom.mutateAsync({ data: payload });

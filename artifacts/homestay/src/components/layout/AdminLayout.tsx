@@ -15,7 +15,6 @@ const navItems = [
   { href: '/admin/media', label: 'Media Library', icon: ImagePlus },
   { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
   { href: '/admin/attractions', label: 'Attractions', icon: Map },
-  { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

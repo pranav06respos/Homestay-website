@@ -25,7 +25,7 @@ export default function GalleryManager() {
 
   const handleToggleVisible = async (id: number, current: boolean) => {
     try {
-      await updateItem.mutateAsync({ params: { id }, data: { isVisible: !current } });
+      await updateItem.mutateAsync({ id, data: { isVisible: !current } });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       toast({ title: "Visibility updated" });
     } catch {
@@ -35,7 +35,7 @@ export default function GalleryManager() {
 
   const handleToggleFeatured = async (id: number, current: boolean) => {
     try {
-      await updateItem.mutateAsync({ params: { id }, data: { isFeatured: !current } });
+      await updateItem.mutateAsync({ id, data: { isFeatured: !current } });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       toast({ title: "Featured status updated" });
     } catch {
@@ -46,7 +46,7 @@ export default function GalleryManager() {
   const handleDelete = async (id: number) => {
     if (confirm("Remove this image from the gallery?")) {
       try {
-        await deleteItem.mutateAsync({ params: { id } });
+        await deleteItem.mutateAsync({ id });
         queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
         toast({ title: "Removed from gallery" });
       } catch {

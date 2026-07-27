@@ -23,7 +23,7 @@ export default function Attractions() {
 
   const handleToggleVisible = async (id: number) => {
     try {
-      await toggleVisible.mutateAsync({ params: { id } });
+      await toggleVisible.mutateAsync({ id });
       queryClient.invalidateQueries({ queryKey: ['/api/attractions'] });
       toast({ title: "Visibility updated" });
     } catch {
@@ -34,7 +34,7 @@ export default function Attractions() {
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this attraction?")) {
       try {
-        await deleteAttraction.mutateAsync({ params: { id } });
+        await deleteAttraction.mutateAsync({ id });
         queryClient.invalidateQueries({ queryKey: ['/api/attractions'] });
         toast({ title: "Attraction deleted" });
       } catch {
@@ -160,7 +160,7 @@ function AttractionDialog({ item, open, onOpenChange }: { item: Attraction | nul
 
     try {
       if (item) {
-        await update.mutateAsync({ params: { id: item.id }, data: payload });
+        await update.mutateAsync({ id: item.id, data: payload });
         toast({ title: "Attraction updated" });
       } else {
         await create.mutateAsync({ data: payload });

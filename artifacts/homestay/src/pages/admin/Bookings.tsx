@@ -1,11 +1,11 @@
 import React from 'react';
-import { useLocation } from 'wouter';
 import { useListBookings, useUpdateBookingStatus, BookingStatusUpdateStatus } from '@workspace/api-client-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { MessageCircle, Phone } from 'lucide-react';
 
 export default function Bookings() {
   const { data: bookings, isLoading } = useListBookings();
@@ -15,7 +15,7 @@ export default function Bookings() {
 
   const handleStatusChange = async (id: number, status: BookingStatusUpdateStatus) => {
     try {
-      await updateStatus.mutateAsync({ params: { id }, data: { status } });
+      await updateStatus.mutateAsync({ id, data: { status } });
       queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
       toast({ title: "Status updated" });
     } catch {
@@ -63,8 +63,30 @@ export default function Bookings() {
                     <div className="text-xs text-muted-foreground">{booking.guests} Guests</div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">{booking.phone}</div>
-                    {booking.email && <div className="text-xs text-muted-foreground">{booking.email}</div>}
+                    <div className="text-sm mb-1">{booking.phone}</div>
+                    {booking.email && <div className="text-xs text-muted-foreground mb-2">{booking.email}</div>}
+                    <div className="flex gap-1.5">
+                      {booking.phone && (
+                        <a
+                          href={`tel:${booking.phone.replace(/\s/g, '')}`}
+                          className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-sm hover:bg-blue-100 transition-colors"
+                          title="Call guest"
+                        >
+                          <Phone className="w-3 h-3" /> Call
+                        </a>
+                      )}
+                      {booking.phone && (
+                        <a
+                          href={`https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${booking.guestName}, thank you for your booking enquiry at Neel Kamal Homestay Kasauli. `)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded-sm hover:bg-green-100 transition-colors"
+                          title="WhatsApp guest"
+                        >
+                          <MessageCircle className="w-3 h-3" /> WhatsApp
+                        </a>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">{new Date(booking.checkIn).toLocaleDateString()}</div>

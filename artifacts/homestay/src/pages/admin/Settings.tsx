@@ -1,15 +1,152 @@
 import React from 'react';
-import { useGetDraftSettings, useUpdateSettings, usePublishSettings } from '@workspace/api-client-react';
+import { useGetDraftSettings, useUpdateSettings, usePublishSettings, useListMedia, Media } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Rocket, Save } from 'lucide-react';
+import { Save, Image as ImageIcon, Check, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
+
+// Inline media picker dialog for selecting a single image
+function MediaPickerDialog({
+  open,
+  onOpenChange,
+  onSelect,
+  currentMediaId,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (mediaId: number, url: string) => void;
+  currentMediaId?: number | null;
+}) {
+  const [search, setSearch] = React.useState('');
+  const { data: mediaFiles, isLoading } = useListMedia({ search });
+  const [selectedId, setSelectedId] = React.useState<number | null>(currentMediaId ?? null);
+
+  React.useEffect(() => {
+    if (open) setSelectedId(currentMediaId ?? null);
+    else setSearch('');
+  }, [open, currentMediaId]);
+
+  const handleConfirm = () => {
+    const chosen = mediaFiles?.find(m => m.id === selectedId);
+    if (chosen) {
+      onSelect(chosen.id, chosen.url);
+      onOpenChange(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="font-serif text-2xl">Choose Image</DialogTitle>
+        </DialogHeader>
+
+        <div className="relative mb-4">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search by filename..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        <div className="flex-1 overflow-y-auto min-h-[300px] border border-border p-4 rounded-sm bg-muted/10">
+          {isLoading ? (
+            <div className="text-center py-12">Loading media...</div>
+          ) : !mediaFiles?.length ? (
+            <div className="text-center py-20 text-muted-foreground">
+              {search ? 'No matches found.' : 'No media uploaded yet. Upload images via the Media Library.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+              {mediaFiles.map((media) => {
+                const isSelected = selectedId === media.id;
+                return (
+                  <div
+                    key={media.id}
+                    className={`relative aspect-square cursor-pointer border-2 rounded-sm overflow-hidden transition-all ${isSelected ? 'border-primary' : 'border-transparent hover:border-primary/50'}`}
+                    onClick={() => setSelectedId(media.id)}
+                  >
+                    <img src={media.url} alt="" className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} />
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white text-[10px] truncate px-2 py-1">
+                      {media.originalName}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="mt-4 border-t border-border pt-4">
+          <div className="flex justify-between items-center w-full">
+            <span className="text-sm text-muted-foreground">{selectedId ? '1 selected' : 'None selected'}</span>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button onClick={handleConfirm} disabled={!selectedId}>Use This Image</Button>
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Small inline image preview + picker trigger
+function ImageField({
+  label,
+  currentUrl,
+  currentMediaId,
+  onSelect,
+}: {
+  label: string;
+  currentUrl?: string | null;
+  currentMediaId?: number | null;
+  onSelect: (mediaId: number, url: string) => void;
+}) {
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+
+  return (
+    <div className="space-y-3">
+      <Label>{label}</Label>
+      <div className="flex items-start gap-4">
+        <div className="w-40 h-28 rounded-sm overflow-hidden bg-muted border border-border flex items-center justify-center shrink-0">
+          {currentUrl ? (
+            <img src={currentUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon className="w-8 h-8 text-muted-foreground/30" />
+          )}
+        </div>
+        <div className="flex flex-col gap-2 pt-1">
+          <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)} className="gap-2">
+            <ImageIcon className="w-4 h-4" />
+            {currentUrl ? 'Change Image' : 'Select Image'}
+          </Button>
+          <p className="text-xs text-muted-foreground">Pick from Media Library. Upload new images there first.</p>
+        </div>
+      </div>
+      <MediaPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={onSelect}
+        currentMediaId={currentMediaId}
+      />
+    </div>
+  );
+}
 
 export default function Settings() {
   const { data: draftSettings, isLoading } = useGetDraftSettings();
@@ -25,11 +162,9 @@ export default function Settings() {
       footerText: '',
       heroHeading: '',
       heroSubheading: '',
-      heroImageUrl: '',
       heroVisible: true,
       aboutHeading: '',
       aboutText: '',
-      aboutImageUrl: '',
       contactPhone: '',
       contactWhatsapp: '',
       contactEmail: '',
@@ -41,6 +176,12 @@ export default function Settings() {
     }
   });
 
+  // Tracked separately (not in react-hook-form) since they're picked via dialog
+  const [heroImageMediaId, setHeroImageMediaId] = React.useState<number | null>(null);
+  const [heroImageUrl, setHeroImageUrl] = React.useState<string | null>(null);
+  const [aboutImageMediaId, setAboutImageMediaId] = React.useState<number | null>(null);
+  const [aboutImageUrl, setAboutImageUrl] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     if (draftSettings) {
       form.reset({
@@ -49,11 +190,9 @@ export default function Settings() {
         footerText: draftSettings.footerText,
         heroHeading: draftSettings.heroHeading,
         heroSubheading: draftSettings.heroSubheading,
-        heroImageUrl: draftSettings.heroImageUrl || '',
         heroVisible: draftSettings.heroVisible,
         aboutHeading: draftSettings.aboutHeading,
         aboutText: draftSettings.aboutText,
-        aboutImageUrl: draftSettings.aboutImageUrl || '',
         contactPhone: draftSettings.contactPhone,
         contactWhatsapp: draftSettings.contactWhatsapp,
         contactEmail: draftSettings.contactEmail,
@@ -63,17 +202,18 @@ export default function Settings() {
         checkOutTime: draftSettings.checkOutTime,
         cancellationPolicy: draftSettings.cancellationPolicy,
       });
+      setHeroImageMediaId(draftSettings.heroImageMediaId ?? null);
+      setHeroImageUrl(draftSettings.heroImageUrl ?? null);
+      setAboutImageMediaId(draftSettings.aboutImageMediaId ?? null);
+      setAboutImageUrl(draftSettings.aboutImageUrl ?? null);
     }
   }, [draftSettings, form]);
 
   const onSaveDraft = async (data: any) => {
     try {
-      // Create a payload without URL strings, which are read-only
-      // In a real app we'd use mediaId pickers, but we'll omit them here to simplify
-      // since the API accepts just the basic fields
-      const payload = { ...data };
-      delete payload.heroImageUrl;
-      delete payload.aboutImageUrl;
+      const payload: any = { ...data };
+      if (heroImageMediaId !== null) payload.heroImageMediaId = heroImageMediaId;
+      if (aboutImageMediaId !== null) payload.aboutImageMediaId = aboutImageMediaId;
 
       await updateSettings.mutateAsync({ data: payload });
       queryClient.invalidateQueries({ queryKey: ['/api/settings/draft'] });
@@ -177,8 +317,15 @@ export default function Settings() {
                   <Label>Subheading</Label>
                   <Input {...form.register('heroSubheading')} />
                 </div>
-                {/* Note: Media picker omitted for brevity, using ID directly would require a modal */}
-                <p className="text-sm text-muted-foreground italic">Use the Media Library to upload and set the Hero Image.</p>
+                <ImageField
+                  label="Hero Background Image"
+                  currentUrl={heroImageUrl}
+                  currentMediaId={heroImageMediaId}
+                  onSelect={(mediaId, url) => {
+                    setHeroImageMediaId(mediaId);
+                    setHeroImageUrl(url);
+                  }}
+                />
               </div>
             </TabsContent>
 
@@ -193,22 +340,31 @@ export default function Settings() {
                   <Label>About Text</Label>
                   <Textarea {...form.register('aboutText')} rows={8} />
                 </div>
-                <p className="text-sm text-muted-foreground italic">Use the Media Library to upload and set the About Image.</p>
+                <ImageField
+                  label="About Section Image"
+                  currentUrl={aboutImageUrl}
+                  currentMediaId={aboutImageMediaId}
+                  onSelect={(mediaId, url) => {
+                    setAboutImageMediaId(mediaId);
+                    setAboutImageUrl(url);
+                  }}
+                />
               </div>
             </TabsContent>
 
             <TabsContent value="contact" className="space-y-6 m-0">
               <h2 className="text-xl font-serif text-primary mb-6">Contact Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
-                <div className="space-y-2">
-                  <Label>Phone Number</Label>
-                  <Input {...form.register('contactPhone')} />
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Phone Number(s)</Label>
+                  <Input {...form.register('contactPhone')} placeholder="+91 00000 00000, +91 00000 00000" />
+                  <p className="text-xs text-muted-foreground">Separate multiple numbers with a comma.</p>
                 </div>
                 <div className="space-y-2">
                   <Label>WhatsApp Number (include country code)</Label>
-                  <Input {...form.register('contactWhatsapp')} />
+                  <Input {...form.register('contactWhatsapp')} placeholder="+919459040109" />
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <Label>Email Address</Label>
                   <Input {...form.register('contactEmail')} type="email" />
                 </div>
@@ -229,11 +385,11 @@ export default function Settings() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label>Check-In Time</Label>
-                    <Input {...form.register('checkInTime')} />
+                    <Input {...form.register('checkInTime')} placeholder="e.g. 1:00 PM" />
                   </div>
                   <div className="space-y-2">
                     <Label>Check-Out Time</Label>
-                    <Input {...form.register('checkOutTime')} />
+                    <Input {...form.register('checkOutTime')} placeholder="e.g. 12:00 PM" />
                   </div>
                 </div>
                 <div className="space-y-2">
