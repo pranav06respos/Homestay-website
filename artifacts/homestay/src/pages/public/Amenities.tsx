@@ -23,14 +23,14 @@ export default function Amenities() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-16">
           {amenities.map((amenity, i) => (
-            <div key={i} className="flex flex-col items-center text-center p-8 bg-card border border-border/50 rounded-sm hover:border-primary/30 transition-colors group">
-              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-6 group-hover:bg-primary/5 transition-colors">
-                <amenity.icon className="w-8 h-8 text-primary/70 group-hover:text-primary transition-colors" />
+            <div key={i} className="flex flex-col items-center text-center p-4 md:p-8 bg-card border border-border/50 rounded-sm hover:border-primary/30 transition-colors group">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 md:mb-6 group-hover:bg-primary/5 transition-colors">
+                <amenity.icon className="w-6 h-6 md:w-8 md:h-8 text-primary/70 group-hover:text-primary transition-colors" />
               </div>
-              <h3 className="text-xl font-serif text-primary mb-3">{amenity.name}</h3>
-              <p className="text-sm text-foreground/70 leading-relaxed font-light">{amenity.desc}</p>
+              <h3 className="text-lg md:text-xl font-serif text-primary mb-2 md:mb-3">{amenity.name}</h3>
+              <p className="text-xs md:text-sm text-foreground/70 leading-relaxed font-light">{amenity.desc}</p>
             </div>
           ))}
         </div>

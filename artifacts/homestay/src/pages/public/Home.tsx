@@ -82,7 +82,7 @@ export default function Home() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2.5 md:gap-3 p-2.5 md:p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-sm text-white"
+                  className="flex gap-2.5 md:gap-3 p-2.5 md:p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-sm text-white flex-row justify-center items-center"
                 >
                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <item.icon className="w-4 h-4 md:w-5 md:h-5 text-white/90" />
@@ -97,7 +97,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* About Section */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -128,21 +127,20 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Amenities Strip */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="text-sm tracking-[0.2em] uppercase text-primary mb-12">Curated Comforts</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {[
               { icon: Wind, label: 'Valley View' },
               { icon: Wifi, label: 'High-Speed WiFi' },
               { icon: Car, label: 'Private Parking' },
               { icon: Coffee, label: 'Room Service' },
             ].map((amenity, i) => (
-              <div key={i} className="flex flex-col items-center justify-center gap-4 p-6 bg-card rounded-sm shadow-sm border border-border">
-                <amenity.icon className="w-8 h-8 text-primary/70" />
-                <span className="font-medium text-foreground">{amenity.label}</span>
+              <div key={i} className="flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 bg-card rounded-sm shadow-sm border border-border">
+                <amenity.icon className="w-6 h-6 md:w-8 md:h-8 text-primary/70" />
+                <span className="font-medium text-foreground text-sm md:text-base">{amenity.label}</span>
               </div>
             ))}
           </div>
@@ -153,7 +151,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Rooms Preview */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -213,7 +210,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Reviews Preview */}
       {visibleReviews.length > 0 && (
         <section className="py-24 bg-muted/50">
@@ -238,7 +234,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
       {/* CTA Section */}
       <section className="py-24 bg-primary text-primary-foreground text-center">
         <div className="container mx-auto px-4 max-w-2xl">
