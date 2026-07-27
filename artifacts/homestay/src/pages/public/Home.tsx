@@ -38,7 +38,7 @@ export default function Home() {
         )}
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
 
-        <div className="relative z-20 text-center px-4 sm:px-6 max-w-4xl mx-auto mt-24 md:mt-20 pb-32 md:pb-0">
+        <div className="relative z-20 text-center px-4 sm:px-6 max-w-4xl mx-auto mt-24 md:mt-20">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -69,31 +69,30 @@ export default function Home() {
             </Link>
           </motion.div>
         </div>
-
-        {/* Nearby Location Cards (mobile-friendly) */}
-        <div className="absolute bottom-6 md:bottom-8 left-0 w-full z-20 px-4 sm:px-6">
-          <div className="container mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto">
-              {[
-                { icon: MapPin, title: 'Heritage Market', meta: '1.5 km • ~10 min' },
-                { icon: Church, title: 'Christ Church', meta: '1.5 km • ~10 min' },
-                { icon: Mountain, title: 'Manki Point', meta: '~13 min' },
-                { icon: Trees, title: 'Gilbert Trail', meta: '~15 min' },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="flex gap-2.5 md:gap-3 p-2.5 md:p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-sm text-white flex-row justify-center items-center"
-                >
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                    <item.icon className="w-4 h-4 md:w-5 md:h-5 text-white/90" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-medium truncate">{item.title}</p>
-                    <p className="text-[10px] md:text-xs text-white/70">{item.meta}</p>
-                  </div>
+      </section>
+      {/* Nearby Location Cards */}
+      <section className="py-6 md:py-8 bg-primary">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto">
+            {[
+              { icon: MapPin, title: 'Heritage Market', meta: '1.5 km • ~10 min' },
+              { icon: Church, title: 'Christ Church', meta: '1.5 km • ~10 min' },
+              { icon: Mountain, title: 'Manki Point', meta: '~13 min' },
+              { icon: Trees, title: 'Gilbert Trail', meta: '~15 min' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="flex gap-2.5 md:gap-3 p-2.5 md:p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-sm text-white flex-row justify-center items-center"
+              >
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                  <item.icon className="w-4 h-4 md:w-5 md:h-5 text-white/90" />
                 </div>
-              ))}
-            </div>
+                <div className="min-w-0">
+                  <p className="text-xs md:text-sm font-medium truncate">{item.title}</p>
+                  <p className="text-[10px] md:text-xs text-white/70">{item.meta}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
