@@ -66,14 +66,15 @@ export default function Book() {
       const room = availableRooms.find(r => r.id === values.roomId);
       const roomName = room ? room.name : 'Any available room';
       
-      const message = `Hello Neel Kamal Homestay! I would like to request a booking:
-*Guest Name:* ${values.guestName}
-*Phone Number:* ${values.phone}
-*Selected Room:* ${roomName}
-*Number of Guests:* ${values.guests}
-*Check-in Date:* ${values.checkIn}
-*Check-out Date:* ${values.checkOut}${values.specialRequest ? `
-*Special Request:* ${values.specialRequest}` : ''}`;
+      const message = `New Booking Request
+
+Guest Name: ${values.guestName}
+Phone Number: ${values.phone}
+Selected Room: ${roomName}
+Number of Guests: ${values.guests}
+Check-in Date: ${values.checkIn}
+Check-out Date: ${values.checkOut}
+Special Request: ${values.specialRequest || ''}`;
 
       window.open(
         `https://wa.me/919459040109?text=${encodeURIComponent(message)}`,
