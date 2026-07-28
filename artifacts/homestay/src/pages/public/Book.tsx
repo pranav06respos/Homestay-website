@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocation } from 'wouter';
 import { useListRooms, useCreateBooking, useGetSettings } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -23,7 +22,6 @@ const bookingSchema = z.object({
 });
 
 export default function Book() {
-  const [, setLocation] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const preselectedRoom = searchParams.get('room');
   
@@ -76,17 +74,13 @@ Check-in Date: ${values.checkIn}
 Check-out Date: ${values.checkOut}
 Special Request: ${values.specialRequest || ''}`;
 
-      window.open(
-        `https://wa.me/919459040109?text=${encodeURIComponent(message)}`,
-        '_blank',
-      );
+      window.location.href = `https://wa.me/919459040109?text=${encodeURIComponent(message)}`;
 
       toast({
         title: "Booking Request Sent",
         description: "We will confirm your reservation shortly.",
       });
 
-      setLocation('/');
     } catch (error) {
       toast({
         title: "Error",
