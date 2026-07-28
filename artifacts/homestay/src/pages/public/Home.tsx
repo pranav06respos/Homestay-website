@@ -96,13 +96,20 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <section className="py-8 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <p className="text-base md:text-lg font-medium text-primary whitespace-pre-line">
+            {settings?.mealHighlight || '🥗 100% Pure Vegetarian Homemade Meals\nFreshly Prepared • Self-Service'}
+          </p>
+        </div>
+      </section>
       {/* About Section */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/5] rounded-sm overflow-hidden bg-muted">
               {settings?.aboutImageUrl ? (
-                <img src={settings.aboutImageUrl} alt="About Neel Kamal" className="object-cover w-full h-full" />
+              <img src={settings.aboutImageUrl} alt="About Neel Kamal Homestay" className="object-cover w-full h-full" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <Wind className="w-24 h-24 opacity-20" />

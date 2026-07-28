@@ -49,8 +49,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border text-sidebar-foreground">
       <div className="p-6 border-b border-sidebar-border">
         <Link href="/" className="inline-flex flex-col items-start">
-          <span className="font-serif text-2xl tracking-wide leading-none text-sidebar-primary">Neel Kamal</span>
-          <span className="text-[10px] tracking-[0.2em] font-medium opacity-70 uppercase mt-1">Admin Panel</span>
+          <span className="font-serif text-2xl tracking-wide leading-none text-sidebar-primary">Neel Kamal Homestay</span>
+          <span className="text-[10px] tracking-[0.2em] font-medium opacity-70 uppercase mt-1">KASAULI · Admin Panel</span>
         </Link>
       </div>
       <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 mr-2">
             <Menu className="w-6 h-6" />
           </button>
-          <span className="font-serif text-xl text-primary">Neel Kamal Admin</span>
+          <span className="font-serif text-xl text-primary">Neel Kamal Homestay · KASAULI</span>
         </header>
         <div className="flex-1 p-6 lg:p-8">
           {children}

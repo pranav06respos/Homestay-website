@@ -8,6 +8,7 @@
 
 export interface SettingsInput {
   siteName?: string;
+  mealHighlight?: string;
   tagline?: string;
   heroHeading?: string;
   heroSubheading?: string;

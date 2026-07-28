@@ -14,7 +14,7 @@ export default function Rooms() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif text-primary mb-6">Our Rooms</h1>
           <p className="text-foreground/70 max-w-2xl mx-auto text-lg">
-            Each room at Neel Kamal is designed to blur the boundary between indoors and the majestic outdoors. 
+            Each room at Neel Kamal Homestay is designed to blur the boundary between indoors and the majestic outdoors.
             Experience the profound quiet of the Himalayas without sacrificing comfort.
           </p>
         </div>

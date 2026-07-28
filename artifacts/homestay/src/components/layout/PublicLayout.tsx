@@ -6,14 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 function useSiteNameParts(siteName?: string | null) {
-  const name = siteName || 'Neel Kamal Homestay Kasauli';
-  const idx = name.indexOf(' Homestay');
-  if (idx !== -1) {
-    return [name.slice(0, idx), name.slice(idx + 1)]; // ["Neel Kamal", "Homestay Kasauli"]
-  }
-  // Fallback: split at last space of first two words
-  const words = name.split(' ');
-  return [words.slice(0, 2).join(' '), words.slice(2).join(' ') || 'Homestay'];
+  return [siteName || 'Neel Kamal Homestay', 'KASAULI'];
 }
 
 export function Navbar() {

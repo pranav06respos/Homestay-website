@@ -16,7 +16,7 @@ export default function About() {
           </h1>
           {settings?.aboutImageUrl && (
             <div className="aspect-[21/9] bg-muted mb-12 rounded-sm overflow-hidden">
-              <img src={settings.aboutImageUrl} alt="Neel Kamal Property" className="w-full h-full object-cover" />
+              <img src={settings.aboutImageUrl} alt="Neel Kamal Homestay Property" className="w-full h-full object-cover" />
             </div>
           )}
           <div className="prose prose-stone max-w-3xl mx-auto text-lg leading-relaxed text-foreground/80 text-left md:text-center font-light">

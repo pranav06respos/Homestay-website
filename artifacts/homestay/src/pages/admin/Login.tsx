@@ -40,8 +40,8 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20">
       <div className="mb-8 text-center">
-        <h1 className="font-serif text-4xl text-primary mb-2">Neel Kamal</h1>
-        <p className="text-xs tracking-[0.3em] font-medium uppercase text-muted-foreground">Admin Portal</p>
+        <h1 className="font-serif text-4xl text-primary mb-2">Neel Kamal Homestay</h1>
+        <p className="text-xs tracking-[0.3em] font-medium uppercase text-muted-foreground">KASAULI · Admin Portal</p>
       </div>
 
       <div className="w-full max-w-md bg-card p-8 rounded-sm shadow-sm border border-border">

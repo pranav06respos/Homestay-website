@@ -15,7 +15,7 @@ export default function Attractions() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif text-primary mb-6">Explore the Surroundings</h1>
           <p className="text-foreground/70 max-w-2xl mx-auto text-lg">
-            Neel Kamal is perfectly situated to offer both profound seclusion and easy access to local landmarks.
+            Neel Kamal Homestay is perfectly situated to offer both profound seclusion and easy access to local landmarks.
           </p>
         </div>
 

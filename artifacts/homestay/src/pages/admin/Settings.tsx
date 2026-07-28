@@ -158,6 +158,7 @@ export default function Settings() {
   const form = useForm({
     defaultValues: {
       siteName: '',
+      mealHighlight: '',
       tagline: '',
       footerText: '',
       heroHeading: '',
@@ -186,6 +187,7 @@ export default function Settings() {
     if (draftSettings) {
       form.reset({
         siteName: draftSettings.siteName,
+        mealHighlight: draftSettings.mealHighlight,
         tagline: draftSettings.tagline,
         footerText: draftSettings.footerText,
         heroHeading: draftSettings.heroHeading,
@@ -293,6 +295,11 @@ export default function Settings() {
                 <div className="space-y-2">
                   <Label>Footer Text</Label>
                   <Input {...form.register('footerText')} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Homepage Property Highlight</Label>
+                  <Textarea {...form.register('mealHighlight')} rows={2} />
+                  <p className="text-xs text-muted-foreground">Use a new line to separate the meal title from the service detail.</p>
                 </div>
               </div>
             </TabsContent>

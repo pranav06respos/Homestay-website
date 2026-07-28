@@ -6,6 +6,7 @@ export const settingsTable = pgTable("settings", {
   id: serial("id").primaryKey(),
   isDraft: boolean("is_draft").notNull().default(false),
   siteName: text("site_name").notNull().default("Neel Kamal Homestay"),
+  mealHighlight: text("meal_highlight").notNull().default("🥗 100% Pure Vegetarian Homemade Meals\nFreshly Prepared • Self-Service"),
   tagline: text("tagline").notNull().default("A mountain retreat in the heart of Kasauli"),
   heroHeading: text("hero_heading").notNull().default("Wake Up to the Mountains"),
   heroSubheading: text("hero_subheading").notNull().default("A premium boutique homestay nestled in the pine forests of Kasauli, Himachal Pradesh"),

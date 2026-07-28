@@ -77,7 +77,7 @@ export default function Bookings() {
                       )}
                       {booking.phone && (
                         <a
-                          href={`https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${booking.guestName}, thank you for your booking enquiry at Neel Kamal Homestay Kasauli. `)}`}
+                          href={`https://wa.me/${booking.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${booking.guestName}, thank you for your booking enquiry at Neel Kamal Homestay · KASAULI. `)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded-sm hover:bg-green-100 transition-colors"

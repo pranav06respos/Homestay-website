@@ -10,6 +10,7 @@ export interface Settings {
   id: number;
   isDraft: boolean;
   siteName: string;
+  mealHighlight?: string;
   tagline: string;
   heroHeading: string;
   heroSubheading: string;
