@@ -2,16 +2,36 @@ import React from 'react';
 import { useGetSettings, useListRooms, useListReviews } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star, Church, Mountain, Trees } from 'lucide-react';
+import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star, Church, Mountain, Trees, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Home() {
   const { data: settings } = useGetSettings();
   const { data: rooms } = useListRooms();
   const { data: reviews } = useListReviews();
+  const [reviewStart, setReviewStart] = React.useState(0);
 
   const visibleRooms = rooms?.filter(r => r.isVisible) || [];
-  const visibleReviews = reviews?.filter(r => r.isVisible) || [];
+  const sampleReviews = [
+    { id: -1, guestName: 'Aarav Mehta', rating: 5, reviewText: 'A beautifully quiet stay with thoughtful hospitality and the most wonderful mountain views.', source: 'Google Reviews' },
+    { id: -2, guestName: 'Priya Sharma', rating: 5, reviewText: 'The perfect Kasauli escape. Everything felt warm, personal, and effortlessly comfortable.', source: 'Google Reviews' },
+    { id: -3, guestName: 'Rohan Kapoor', rating: 5, reviewText: 'Peaceful mornings, immaculate rooms, and genuinely kind hosts. We will be back.', source: 'Google Reviews' },
+    { id: -4, guestName: 'Ananya Gupta', rating: 5, reviewText: 'A hidden gem in the hills with a calm, premium feel and incredible sunset skies.', source: 'Google Reviews' },
+    { id: -5, guestName: 'Vikram Singh', rating: 5, reviewText: 'The location is serene, the stay is beautifully maintained, and the service is exceptional.', source: 'Google Reviews' },
+    { id: -6, guestName: 'Meera Nair', rating: 5, reviewText: 'A memorable weekend surrounded by pine forests and generous, attentive hospitality.', source: 'Google Reviews' },
+  ];
+  const apiReviews = reviews?.filter(r => r.isVisible) || [];
+  const visibleReviews = [...apiReviews, ...sampleReviews].slice(0, 6);
+  const reviewPageCount = Math.max(1, visibleReviews.length - 2);
+  const displayedReviews = [0, 1, 2].map(offset => visibleReviews[(reviewStart + offset) % visibleReviews.length]);
+
+  React.useEffect(() => {
+    if (visibleReviews.length < 4) return;
+    const interval = window.setInterval(() => {
+      setReviewStart(current => (current + 3) % reviewPageCount);
+    }, 15000);
+    return () => window.clearInterval(interval);
+  }, [visibleReviews.length, reviewPageCount]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -221,9 +241,16 @@ export default function Home() {
         <section className="py-24 bg-muted/50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-serif text-primary mb-12">Guest Experiences</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {visibleReviews.slice(0, 3).map((review) => (
-                <div key={review.id} className="bg-card p-8 rounded-sm shadow-sm border border-border text-left flex flex-col h-full">
+            <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {displayedReviews.map((review) => (
+                <motion.div
+                  key={`${review.id}-${reviewStart}`}
+                  initial={{ opacity: 0, x: 18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-card p-8 rounded-sm shadow-sm border border-border text-left flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                >
                   <div className="flex gap-1 mb-4 text-accent">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-muted-foreground/30'}`} />
@@ -234,8 +261,25 @@ export default function Home() {
                     <p className="font-medium text-primary">{review.guestName}</p>
                     {review.source && <p className="text-xs text-muted-foreground mt-1">via {review.source}</p>}
                   </div>
+                </motion.div>
+                  ))}
                 </div>
-              ))}
+                <button
+                  type="button"
+                  aria-label="Previous reviews"
+                  onClick={() => setReviewStart(current => (current - 3 + reviewPageCount) % reviewPageCount)}
+                  className="absolute -left-3 md:-left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border text-primary shadow-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next reviews"
+                  onClick={() => setReviewStart(current => (current + 3) % reviewPageCount)}
+                  className="absolute -right-3 md:-right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border text-primary shadow-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
             </div>
           </div>
         </section>

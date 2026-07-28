@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { useGetSettings } from '@workspace/api-client-react';
-import { Menu, X, Phone, MapPin, MessageCircle, Plus } from 'lucide-react';
+import { Menu, X, Phone, MapPin, MessageCircle, Plus, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function useSiteNameParts(siteName?: string | null) {
   return [siteName || 'Neel Kamal Homestay', 'KASAULI'];
@@ -14,6 +15,21 @@ export function Navbar() {
   const [location] = useLocation();
   const [scrolled, setScrolled] = React.useState(false);
   const { data: settings } = useGetSettings();
+  const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
+
+  React.useEffect(() => {
+    const storedTheme = localStorage.getItem('neel-kamal-theme') as 'light' | 'dark' | null;
+    const preferredTheme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(preferredTheme);
+    document.documentElement.classList.toggle('dark', preferredTheme === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('neel-kamal-theme', nextTheme);
+    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+  };
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -62,10 +78,26 @@ export function Navbar() {
             <Link href="/book" className={`px-5 py-2 border rounded-sm text-sm tracking-wide transition-colors ${scrolled || !isHome ? 'border-primary text-primary hover:bg-primary hover:text-primary-foreground' : 'border-white text-white hover:bg-white hover:text-primary'}`}>
               Book Now
             </Link>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${scrolled || !isHome ? 'text-foreground hover:bg-muted' : 'text-white hover:bg-white/10'}`}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${linkColor}`}
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className={linkColor}
@@ -232,11 +264,23 @@ export function FloatingContact() {
 }
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
+
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20 selection:text-primary overflow-x-hidden">
+    <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20 selection:text-primary overflow-x-hidden transition-colors duration-300">
       <Navbar />
       <main className="flex-1 pb-20 md:pb-0">
-        {children}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
       <FloatingContact />
       <Footer />
