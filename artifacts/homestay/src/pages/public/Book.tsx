@@ -67,18 +67,18 @@ export default function Book() {
       const roomName = room ? room.name : 'Any available room';
       
       const message = `Hello Neel Kamal Homestay! I would like to request a booking:
-*Name:* ${values.guestName}
-*Phone:* ${values.phone}
-*Dates:* ${values.checkIn} to ${values.checkOut}
-*Guests:* ${values.guests}
-*Room Preference:* ${roomName}
-${values.specialRequest ? `*Special Request:* ${values.specialRequest}` : ''}`;
+*Guest Name:* ${values.guestName}
+*Phone Number:* ${values.phone}
+*Selected Room:* ${roomName}
+*Number of Guests:* ${values.guests}
+*Check-in Date:* ${values.checkIn}
+*Check-out Date:* ${values.checkOut}${values.specialRequest ? `
+*Special Request:* ${values.specialRequest}` : ''}`;
 
-      const whatsappNumber = settings?.contactWhatsapp?.replace(/\D/g, '') || '';
-      
-      if (whatsappNumber) {
-        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-      }
+      window.open(
+        `https://wa.me/919459040109?text=${encodeURIComponent(message)}`,
+        '_blank',
+      );
 
       toast({
         title: "Booking Request Sent",
