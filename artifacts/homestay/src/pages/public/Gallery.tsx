@@ -35,10 +35,12 @@ export default function Gallery() {
         ) : (
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
             {sortedItems.map((item) => (
-              <div 
+              <button
+                type="button"
                 key={item.id} 
                 className="break-inside-avoid relative group cursor-pointer rounded-sm overflow-hidden bg-muted"
                 onClick={() => setSelectedImage(item.url)}
+                aria-label={`Open ${item.altText || 'gallery image'}`}
               >
                 <img 
                   src={item.url} 
@@ -47,7 +49,7 @@ export default function Gallery() {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -62,7 +64,9 @@ export default function Gallery() {
             className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={() => setSelectedImage(null)}
           >
-            <button 
+             <button
+               type="button"
+               aria-label="Close expanded image"
               className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
               onClick={() => setSelectedImage(null)}
             >

@@ -8,6 +8,15 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+const allowedOrigins = new Set(
+  [
+    process.env.REPLIT_DEV_DOMAIN,
+    ...(process.env.REPLIT_DOMAINS?.split(",") ?? []),
+    "http://localhost:3000",
+    "http://localhost:5173",
+  ].filter(Boolean),
+);
+
 app.use(
   pinoHttp({
     logger,
@@ -28,14 +37,27 @@ app.use(
   }),
 );
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error("Origin not allowed"));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session middleware
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "neel-kamal-dev-secret",
+    secret: process.env.SESSION_SECRET || (() => {
+      throw new Error("SESSION_SECRET must be configured");
+    })(),
     resave: false,
     saveUninitialized: false,
     cookie: {

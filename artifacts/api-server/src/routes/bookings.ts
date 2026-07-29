@@ -42,6 +42,12 @@ router.post("/bookings", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  const checkIn = new Date(parsed.data.checkIn);
+  const checkOut = new Date(parsed.data.checkOut);
+  if (!Number.isFinite(checkIn.getTime()) || !Number.isFinite(checkOut.getTime()) || checkOut <= checkIn) {
+    res.status(400).json({ error: "Check-out must be after check-in" });
+    return;
+  }
   const [booking] = await db.insert(bookingsTable).values({ ...parsed.data, status: "pending" }).returning();
   res.status(201).json(await bookingWithRoom(booking));
 });

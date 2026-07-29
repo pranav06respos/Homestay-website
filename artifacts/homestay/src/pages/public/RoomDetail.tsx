@@ -8,7 +8,9 @@ export default function RoomDetail() {
   const { slug } = useParams();
   const { data: rooms, isLoading: isLoadingRooms } = useListRooms();
   const room = rooms?.find(r => r.slug === slug);
-  const { data: images } = useListRoomImages(room?.id || 0, { query: { enabled: !!room?.id } });
+  const { data: images } = useListRoomImages(room?.id || 0, {
+    query: { enabled: !!room?.id, queryKey: ['/api/rooms', room?.id || 0, 'images'] },
+  });
 
   const [currentImageIdx, setCurrentImageIdx] = React.useState(0);
 
@@ -93,15 +95,17 @@ export default function RoomDetail() {
                 />
                 {displayImages.length > 1 && (
                   <>
-                    <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background text-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                     <button type="button" aria-label="Previous room image" onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background text-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                       <ChevronLeft className="w-6 h-6" />
                     </button>
-                    <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background text-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                     <button type="button" aria-label="Next room image" onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 hover:bg-background text-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                       <ChevronRight className="w-6 h-6" />
                     </button>
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                       {displayImages.map((_, i) => (
-                        <button 
+                         <button
+                           type="button"
+                           aria-label={`Show room image ${i + 1}`}
                           key={i} 
                           onClick={() => setCurrentImageIdx(i)}
                           className={`w-2 h-2 rounded-full transition-all ${i === currentImageIdx ? 'bg-white w-4' : 'bg-white/50'}`}

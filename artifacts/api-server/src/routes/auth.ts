@@ -4,9 +4,14 @@ import { AdminLoginBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin1234";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 router.post("/auth/login", async (req, res): Promise<void> => {
+  if (!ADMIN_PASSWORD) {
+    res.status(503).json({ error: "Admin authentication is not configured" });
+    return;
+  }
+
   const parsed = AdminLoginBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

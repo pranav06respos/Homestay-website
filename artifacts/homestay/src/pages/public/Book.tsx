@@ -19,6 +19,14 @@ const bookingSchema = z.object({
   checkIn: z.string().min(1, "Check-in date required"),
   checkOut: z.string().min(1, "Check-out date required"),
   specialRequest: z.string().optional(),
+}).superRefine((values, ctx) => {
+  if (values.checkIn && values.checkOut && values.checkOut <= values.checkIn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['checkOut'],
+      message: 'Check-out must be after check-in',
+    });
+  }
 });
 
 export default function Book() {
@@ -54,7 +62,7 @@ export default function Book() {
         phone: values.phone,
         email: values.email || undefined,
         guests: values.guests,
-        roomId: values.roomId,
+        roomId: values.roomId && values.roomId > 0 ? values.roomId : undefined,
         checkIn: new Date(values.checkIn).toISOString(),
         checkOut: new Date(values.checkOut).toISOString(),
         specialRequest: values.specialRequest,

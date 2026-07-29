@@ -269,6 +269,44 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   React.useEffect(() => {
     window.history.scrollRestoration = 'manual';
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+    const metadata: Record<string, { title: string; description: string }> = {
+      '/': {
+        title: 'Neel Kamal Homestay · KASAULI',
+        description: 'A premium boutique homestay in Kasauli, Himachal Pradesh.',
+      },
+      '/rooms': {
+        title: 'Rooms · Neel Kamal Homestay Kasauli',
+        description: 'Discover peaceful rooms and thoughtful comforts at Neel Kamal Homestay in Kasauli.',
+      },
+      '/gallery': {
+        title: 'Gallery · Neel Kamal Homestay Kasauli',
+        description: 'Explore the rooms, views, and surroundings of Neel Kamal Homestay.',
+      },
+      '/amenities': {
+        title: 'Amenities · Neel Kamal Homestay Kasauli',
+        description: 'Enjoy thoughtful amenities and mountain comfort at Neel Kamal Homestay.',
+      },
+      '/attractions': {
+        title: 'Attractions · Neel Kamal Homestay Kasauli',
+        description: 'Discover Kasauli landmarks and mountain experiences near Neel Kamal Homestay.',
+      },
+      '/about': {
+        title: 'About · Neel Kamal Homestay Kasauli',
+        description: 'Learn the story and policies behind Neel Kamal Homestay in Kasauli.',
+      },
+      '/contact': {
+        title: 'Contact · Neel Kamal Homestay Kasauli',
+        description: 'Contact Neel Kamal Homestay to plan your mountain retreat in Kasauli.',
+      },
+      '/book': {
+        title: 'Book Your Stay · Neel Kamal Homestay Kasauli',
+        description: 'Send a booking request for your stay at Neel Kamal Homestay.',
+      },
+    };
+    const page = metadata[location] ?? metadata['/'];
+    document.title = page.title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', page.description);
   }, [location]);
 
   return (

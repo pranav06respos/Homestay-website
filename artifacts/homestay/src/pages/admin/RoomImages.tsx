@@ -16,8 +16,12 @@ export default function RoomImages() {
   const { id } = useParams();
   const roomId = parseInt(id || '0', 10);
   
-  const { data: room, isLoading: isLoadingRoom } = useGetRoom(roomId, { query: { enabled: !!roomId } });
-  const { data: images, isLoading: isLoadingImages } = useListRoomImages(roomId, { query: { enabled: !!roomId } });
+  const { data: room, isLoading: isLoadingRoom } = useGetRoom(roomId, {
+    query: { enabled: !!roomId, queryKey: ['/api/rooms', roomId] },
+  });
+  const { data: images, isLoading: isLoadingImages } = useListRoomImages(roomId, {
+    query: { enabled: !!roomId, queryKey: ['/api/rooms', roomId, 'images'] },
+  });
   
   const setCover = useSetRoomCoverImage();
   const removeImage = useRemoveRoomImage();
