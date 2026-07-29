@@ -1,0 +1,1 @@
+- [Security configuration](security-configuration.md) — admin/session secrets are required and credentialed CORS uses an explicit origin allowlist.
