@@ -55,6 +55,21 @@ export default function Book() {
     },
   });
 
+  const getWhatsAppUrl = (values: z.infer<typeof bookingSchema>) => {
+    const room = availableRooms.find(r => r.id === values.roomId);
+    const roomName = room ? room.name : 'Any available room';
+    const message = `New Booking Request
+
+Guest Name: ${values.guestName}
+Phone Number: ${values.phone}
+Selected Room: ${roomName}
+Number of Guests: ${values.guests}
+Check-in Date: ${values.checkIn}
+Check-out Date: ${values.checkOut}
+Special Request: ${values.specialRequest || ''}`;
+    return `https://wa.me/919459040109?text=${encodeURIComponent(message)}`;
+  };
+
   const onSubmit = async (values: z.infer<typeof bookingSchema>) => {
     try {
       await createBooking.mutateAsync({ data: {
@@ -68,33 +83,18 @@ export default function Book() {
         specialRequest: values.specialRequest,
       }});
 
-      // Generate WhatsApp message
-      const room = availableRooms.find(r => r.id === values.roomId);
-      const roomName = room ? room.name : 'Any available room';
-      
-      const message = `New Booking Request
-
-Guest Name: ${values.guestName}
-Phone Number: ${values.phone}
-Selected Room: ${roomName}
-Number of Guests: ${values.guests}
-Check-in Date: ${values.checkIn}
-Check-out Date: ${values.checkOut}
-Special Request: ${values.specialRequest || ''}`;
-
-      window.location.href = `https://wa.me/919459040109?text=${encodeURIComponent(message)}`;
-
+      window.location.href = getWhatsAppUrl(values);
       toast({
         title: "Booking Request Sent",
         description: "We will confirm your reservation shortly.",
       });
 
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "Failed to submit booking request. Please try again.",
-        variant: "destructive",
+        title: "Opening WhatsApp",
+        description: "The booking server is unavailable. Your details are ready to send directly to Neel Kamal Homestay.",
       });
+      window.location.href = getWhatsAppUrl(values);
     }
   };
 
