@@ -35,7 +35,7 @@ async function roomWithCover(room: typeof roomsTable.$inferSelect) {
   return {
     ...room,
     pricePerNight: room.pricePerNight ? parseFloat(String(room.pricePerNight)) : null,
-    coverImageUrl: cover?.url ?? null,
+    coverImageUrl: cover?.url?.startsWith("http") ? new URL(cover.url).pathname : (cover?.url ?? null),
     createdAt: room.createdAt.toISOString(),
     updatedAt: room.updatedAt.toISOString(),
   };
@@ -44,6 +44,13 @@ async function roomWithCover(room: typeof roomsTable.$inferSelect) {
 // GET /rooms
 router.get("/rooms", async (req, res): Promise<void> => {
   const isAdmin = req.query.admin === "true";
+  if (isAdmin) {
+    const session = req.session as { admin?: boolean };
+    if (!session.admin) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+  }
   let rooms;
   if (isAdmin) {
     rooms = await db.select().from(roomsTable).orderBy(roomsTable.sortOrder);
@@ -183,7 +190,7 @@ router.get("/rooms/:id/images", async (req, res): Promise<void> => {
       mediaId: roomImagesTable.mediaId,
       isCover: roomImagesTable.isCover,
       sortOrder: roomImagesTable.sortOrder,
-      url: mediaTable.url,
+       url: mediaTable.url,
       altText: mediaTable.altText,
       filename: mediaTable.filename,
     })
@@ -191,7 +198,10 @@ router.get("/rooms/:id/images", async (req, res): Promise<void> => {
     .innerJoin(mediaTable, eq(roomImagesTable.mediaId, mediaTable.id))
     .where(eq(roomImagesTable.roomId, params.data.id))
     .orderBy(roomImagesTable.sortOrder);
-  res.json(images);
+  res.json(images.map((image) => ({
+    ...image,
+    url: image.url.startsWith("http") ? new URL(image.url).pathname : image.url,
+  })));
 });
 
 // POST /rooms/:id/images

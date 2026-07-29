@@ -33,6 +33,8 @@ export interface Settings {
   checkInTime: string;
   checkOutTime: string;
   cancellationPolicy: string;
+  amenitiesText?: string;
+  googleReviewsUrl?: string;
   footerText: string;
   /** @nullable */
   logoUrl?: string | null;

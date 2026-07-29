@@ -972,6 +972,10 @@ components:
           type: string
         cancellationPolicy:
           type: string
+        amenitiesText:
+          type: string
+        googleReviewsUrl:
+          type: string
         footerText:
           type: string
         logoUrl:
@@ -1045,6 +1049,10 @@ components:
         checkOutTime:
           type: string
         cancellationPolicy:
+          type: string
+        amenitiesText:
+          type: string
+        googleReviewsUrl:
           type: string
         footerText:
           type: string

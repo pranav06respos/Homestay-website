@@ -1,7 +1,8 @@
 import React from 'react';
+import { useGetSettings } from '@workspace/api-client-react';
 import { Wind, Wifi, Car, Coffee, Tv, Shield, Trees, Map, Utensils, Mountain } from 'lucide-react';
 
-const amenities = [
+const defaultAmenities = [
   { icon: Mountain, name: 'Valley View', desc: 'Panoramic views of the Himalayan range from your private balcony or window.' },
   { icon: Wifi, name: 'High-Speed WiFi', desc: 'Stay connected with reliable, fast internet access throughout the property.' },
   { icon: Car, name: 'Free Parking', desc: 'Secure, complimentary parking available on the premises.' },
@@ -13,6 +14,13 @@ const amenities = [
 ];
 
 export default function Amenities() {
+  const { data: settings } = useGetSettings();
+  const amenities = settings?.amenitiesText
+    ? settings.amenitiesText.split('\n').map((line, i) => {
+        const [name, ...description] = line.split('|');
+        return { icon: defaultAmenities[i % defaultAmenities.length].icon, name: name.trim(), desc: description.join('|').trim() };
+      }).filter((item) => item.name)
+    : defaultAmenities;
   return (
     <div className="pt-32 pb-24 min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">

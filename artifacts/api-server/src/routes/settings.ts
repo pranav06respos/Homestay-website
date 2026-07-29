@@ -7,6 +7,35 @@ import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
+function normalizeMediaUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname.startsWith("/api/uploads/")) return parsed.pathname;
+  } catch {
+    // Already a relative URL or legacy non-URL value.
+  }
+  return url;
+}
+
+async function withResolvedMediaUrls(settings: typeof settingsTable.$inferSelect) {
+  const result = { ...settings };
+  for (const [mediaIdKey, urlKey] of [
+    ["heroImageMediaId", "heroImageUrl"],
+    ["aboutImageMediaId", "aboutImageUrl"],
+    ["logoMediaId", "logoUrl"],
+  ] as const) {
+    const mediaId = result[mediaIdKey];
+    if (mediaId) {
+      const [media] = await db.select({ url: mediaTable.url }).from(mediaTable).where(eq(mediaTable.id, mediaId));
+      result[urlKey] = normalizeMediaUrl(media?.url ?? result[urlKey]);
+    } else {
+      result[urlKey] = normalizeMediaUrl(result[urlKey]);
+    }
+  }
+  return result;
+}
+
 async function ensureSettings() {
   const rows = await db.select().from(settingsTable);
   const published = rows.find((r) => !r.isDraft);
@@ -27,13 +56,13 @@ async function ensureSettings() {
 router.get("/settings", async (req, res): Promise<void> => {
   await ensureSettings();
   const [settings] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, false));
-  res.json(settings);
+  res.json(await withResolvedMediaUrls(settings));
 });
 
 router.get("/settings/draft", requireAdmin, async (req, res): Promise<void> => {
   await ensureSettings();
   const [draft] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, true));
-  res.json(draft);
+  res.json(await withResolvedMediaUrls(draft));
 });
 
 router.put("/settings", requireAdmin, async (req, res): Promise<void> => {

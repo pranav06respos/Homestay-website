@@ -53,6 +53,8 @@ export interface Settings {
   checkInTime: string;
   checkOutTime: string;
   cancellationPolicy: string;
+  amenitiesText?: string;
+  googleReviewsUrl?: string;
   footerText: string;
   /** @nullable */
   logoUrl?: string | null;
@@ -84,6 +86,8 @@ export interface SettingsInput {
   checkInTime?: string;
   checkOutTime?: string;
   cancellationPolicy?: string;
+  amenitiesText?: string;
+  googleReviewsUrl?: string;
   footerText?: string;
   /** @nullable */
   logoMediaId?: number | null;

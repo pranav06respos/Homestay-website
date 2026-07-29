@@ -174,6 +174,8 @@ export default function Settings() {
       checkInTime: '',
       checkOutTime: '',
       cancellationPolicy: '',
+      amenitiesText: '',
+      googleReviewsUrl: '',
     }
   });
 
@@ -203,6 +205,8 @@ export default function Settings() {
         checkInTime: draftSettings.checkInTime,
         checkOutTime: draftSettings.checkOutTime,
         cancellationPolicy: draftSettings.cancellationPolicy,
+        amenitiesText: draftSettings.amenitiesText,
+        googleReviewsUrl: draftSettings.googleReviewsUrl,
       });
       setHeroImageMediaId(draftSettings.heroImageMediaId ?? null);
       setHeroImageUrl(draftSettings.heroImageUrl ?? null);
@@ -383,6 +387,10 @@ export default function Settings() {
                   <Label>Google Maps URL</Label>
                   <Input {...form.register('googleMapsUrl')} />
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Google Reviews URL</Label>
+                  <Input {...form.register('googleReviewsUrl')} />
+                </div>
               </div>
             </TabsContent>
 
@@ -402,6 +410,11 @@ export default function Settings() {
                 <div className="space-y-2">
                   <Label>Cancellation Policy</Label>
                   <Textarea {...form.register('cancellationPolicy')} rows={4} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Amenities</Label>
+                  <Textarea {...form.register('amenitiesText')} rows={10} placeholder="Amenity name|Description" />
+                  <p className="text-xs text-muted-foreground">One amenity per line, using <code>Name|Description</code>.</p>
                 </div>
               </div>
             </TabsContent>

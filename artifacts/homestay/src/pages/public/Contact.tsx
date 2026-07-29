@@ -98,7 +98,7 @@ export default function Contact() {
             {settings?.googleMapsUrl ? (
               <iframe 
                 title="Neel Kamal Homestay location map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3421.4395886367566!2d76.95353131513476!3d30.902237881571434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390f898c8c50e2db%3A0xc3c9a6231bdc863!2sNeel%20Kamal%20Homestay!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin" 
+                src={settings.googleMapsUrl}
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 

@@ -20,6 +20,13 @@ function parseId(raw: string | string[]): number {
 // GET /attractions
 router.get("/attractions", async (req, res): Promise<void> => {
   const isAdmin = req.query.admin === "true";
+  if (isAdmin) {
+    const session = req.session as { admin?: boolean };
+    if (!session.admin) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+  }
   let items;
   if (isAdmin) {
     items = await db.select().from(attractionsTable).orderBy(asc(attractionsTable.sortOrder));

@@ -46,14 +46,19 @@ const upload = multer({
   },
 });
 
+function normalizeMediaUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname.startsWith("/api/uploads/")) return parsed.pathname;
+  } catch {
+    // Keep existing relative or legacy values unchanged.
+  }
+  return url;
+}
+
 function parseId(raw: string | string[]): number {
   const s = Array.isArray(raw) ? raw[0] : raw;
   return parseInt(s, 10);
-}
-
-function getBaseUrl(req: { hostname: string; protocol: string; get: (h: string) => string | undefined }): string {
-  const host = req.get("host") ?? "localhost";
-  return `${req.protocol}://${host}`;
 }
 
 // GET /media
@@ -65,7 +70,7 @@ router.get("/media", requireAdmin, async (req, res): Promise<void> => {
   }
 
   const media = await query.orderBy(mediaTable.createdAt);
-  res.json(media.map((m) => ({ ...m, createdAt: m.createdAt.toISOString() })));
+  res.json(media.map((m) => ({ ...m, url: normalizeMediaUrl(m.url), createdAt: m.createdAt.toISOString() })));
 });
 
 // POST /media/upload
@@ -75,8 +80,8 @@ router.post("/media/upload", requireAdmin, upload.single("file"), async (req, re
     return;
   }
 
-  const baseUrl = getBaseUrl(req as Parameters<typeof getBaseUrl>[0]);
-  const url = `${baseUrl}/api/uploads/${req.file.filename}`;
+  // Keep media same-origin so proxied previews and deployments resolve correctly.
+  const url = `/api/uploads/${req.file.filename}`;
   const altText = req.body.altText as string | undefined;
 
   const [media] = await db
@@ -107,7 +112,7 @@ router.get("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  res.json({ ...media, createdAt: media.createdAt.toISOString() });
+  res.json({ ...media, url: normalizeMediaUrl(media.url), createdAt: media.createdAt.toISOString() });
 });
 
 // PUT /media/:id
@@ -131,7 +136,7 @@ router.put("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  res.json({ ...media, createdAt: media.createdAt.toISOString() });
+  res.json({ ...media, url: normalizeMediaUrl(media.url), createdAt: media.createdAt.toISOString() });
 });
 
 // DELETE /media/:id
@@ -178,7 +183,7 @@ router.patch("/media/:id/usage", requireAdmin, async (req, res): Promise<void> =
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  res.json({ ...media, createdAt: media.createdAt.toISOString() });
+  res.json({ ...media, url: normalizeMediaUrl(media.url), createdAt: media.createdAt.toISOString() });
 });
 
 export default router;

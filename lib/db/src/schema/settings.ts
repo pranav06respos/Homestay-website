@@ -25,6 +25,8 @@ export const settingsTable = pgTable("settings", {
   checkInTime: text("check_in_time").notNull().default("12:00 PM"),
   checkOutTime: text("check_out_time").notNull().default("11:00 AM"),
   cancellationPolicy: text("cancellation_policy").notNull().default("Free cancellation up to 48 hours before check-in. Cancellations within 48 hours are subject to one night's charge."),
+  amenitiesText: text("amenities_text").notNull().default("Valley View|Panoramic views of the Himalayan range from your private balcony or window.\nHigh-Speed WiFi|Stay connected with reliable, fast internet access throughout the property.\nFree Parking|Secure, complimentary parking available on the premises.\nRoom Service|Enjoy hot meals and beverages delivered right to your door.\n24×7 Hot Water|Continuous hot water supply to keep you warm in the mountain chill.\nCCTV Security|Round-the-clock surveillance in common areas for your safety.\nPrivate Balcony|Step out into the crisp mountain air without leaving your room.\nIn-House Dining|Home-cooked local and multi-cuisine delicacies prepared fresh."),
+  googleReviewsUrl: text("google_reviews_url").notNull().default("https://www.google.com/search?q=Neel+Kamal+Homestay+Kasauli+reviews"),
   footerText: text("footer_text").notNull().default("Neel Kamal Homestay — Where the mountains meet you halfway."),
   logoUrl: text("logo_url"),
   logoMediaId: integer("logo_media_id"),

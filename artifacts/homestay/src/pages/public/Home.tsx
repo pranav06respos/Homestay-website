@@ -37,7 +37,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-[88vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden">
-        {settings?.heroImageUrl ? (
+        {settings?.heroVisible !== false && settings?.heroImageUrl ? (
           <picture className="absolute inset-0 z-0">
             <img
               src={settings.heroImageUrl}
@@ -47,7 +47,7 @@ export default function Home() {
               decoding="async"
             />
           </picture>
-        ) : (
+        ) : settings?.heroVisible !== false ? (
           <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/20 to-background flex items-end justify-center">
             {/* Elegant mountain silhouette placeholder */}
             <svg viewBox="0 0 1440 320" className="w-full h-auto text-primary/10 fill-current opacity-50" preserveAspectRatio="none">
@@ -55,7 +55,7 @@ export default function Home() {
               <path d="M0,320 L1440,320 L1440,240 C1100,280 900,180 700,260 C500,340 200,200 0,300 Z" className="text-primary/20"></path>
             </svg>
           </div>
-        )}
+        ) : null}
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
 
         <div className="relative z-20 text-center px-4 sm:px-6 max-w-4xl mx-auto mt-24 md:mt-20">
@@ -291,7 +291,7 @@ export default function Home() {
           <h3 className="text-2xl md:text-3xl font-serif text-foreground mb-4">Stayed with us? We'd love your review.</h3>
           <p className="text-foreground/60 mb-8 text-sm leading-relaxed">Your kind words help other travellers discover this little corner of the Himalayas.</p>
           <a
-            href="https://www.google.com/search?q=Neel+Kamal+Homestay+Kasauli+reviews"
+             href={settings?.googleReviewsUrl || "https://www.google.com/search?q=Neel+Kamal+Homestay+Kasauli+reviews"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-3 border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-sm transition-colors uppercase text-xs tracking-wider font-medium"

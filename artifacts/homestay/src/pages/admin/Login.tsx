@@ -54,7 +54,7 @@ export default function AdminLogin() {
                 <FormItem>
                   <FormLabel className="uppercase tracking-widest text-xs">Admin Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter password" {...field} />
+                    <Input type="password" autoComplete="current-password" placeholder="Enter password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

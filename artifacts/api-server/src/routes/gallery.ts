@@ -22,7 +22,7 @@ async function galleryWithMedia(item: typeof galleryTable.$inferSelect) {
   const [media] = await db.select().from(mediaTable).where(eq(mediaTable.id, item.mediaId));
   return {
     ...item,
-    url: media?.url ?? "",
+    url: media?.url?.startsWith("http") ? new URL(media.url).pathname : (media?.url ?? ""),
     altText: media?.altText ?? null,
     filename: media?.filename ?? "",
     createdAt: item.createdAt.toISOString(),
@@ -32,6 +32,13 @@ async function galleryWithMedia(item: typeof galleryTable.$inferSelect) {
 // GET /gallery
 router.get("/gallery", async (req, res): Promise<void> => {
   const isAdmin = req.query.admin === "true";
+  if (isAdmin) {
+    const session = req.session as { admin?: boolean };
+    if (!session.admin) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+  }
   let items;
   if (isAdmin) {
     items = await db.select().from(galleryTable).orderBy(asc(galleryTable.sortOrder));
