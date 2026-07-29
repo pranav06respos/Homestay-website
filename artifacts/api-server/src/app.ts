@@ -8,14 +8,22 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-const allowedOrigins = new Set(
-  [
-    process.env.REPLIT_DEV_DOMAIN,
-    ...(process.env.REPLIT_DOMAINS?.split(",") ?? []),
-    "http://localhost:3000",
-    "http://localhost:5173",
-  ].filter(Boolean),
-);
+const configuredDomains = [
+  process.env.REPLIT_DEV_DOMAIN,
+  ...(process.env.REPLIT_DOMAINS?.split(",") ?? []),
+]
+  .filter((domain): domain is string => Boolean(domain))
+  .map((domain) => domain.trim())
+  .filter(Boolean);
+
+const allowedOrigins = new Set([
+  ...configuredDomains.flatMap((domain) => [
+    `https://${domain.replace(/^https?:\/\//, "")}`,
+    `http://${domain.replace(/^https?:\/\//, "")}`,
+  ]),
+  "http://localhost:3000",
+  "http://localhost:5173",
+]);
 
 function isAllowedOrigin(origin: string): boolean {
   if (allowedOrigins.has(origin)) {
@@ -24,7 +32,11 @@ function isAllowedOrigin(origin: string): boolean {
 
   try {
     const { hostname } = new URL(origin);
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+    return (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]"
+    );
   } catch {
     return false;
   }

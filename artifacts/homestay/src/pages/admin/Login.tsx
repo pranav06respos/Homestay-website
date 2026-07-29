@@ -33,7 +33,12 @@ export default function AdminLogin() {
         toast({ title: "Invalid password", variant: "destructive" });
       }
     } catch (error) {
-      toast({ title: "Invalid password", variant: "destructive" });
+      const message = error instanceof Error ? error.message : "Unable to sign in";
+      toast({
+        title: message.includes("401") ? "Invalid password" : "Unable to sign in",
+        description: message.includes("401") ? undefined : "Please try again in a moment.",
+        variant: "destructive",
+      });
     }
   };
 
