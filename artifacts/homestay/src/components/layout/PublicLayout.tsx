@@ -266,6 +266,11 @@ export function FloatingContact() {
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
+  React.useEffect(() => {
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [location]);
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20 selection:text-primary overflow-x-hidden transition-colors duration-300">
       <Navbar />
