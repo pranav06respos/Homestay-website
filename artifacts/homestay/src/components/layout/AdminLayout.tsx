@@ -9,13 +9,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/rooms', label: 'Rooms', icon: BedDouble },
-  { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon },
-  { href: '/admin/media', label: 'Media Library', icon: ImagePlus },
-  { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
-  { href: '/admin/attractions', label: 'Attractions', icon: Map },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/rooms', label: 'Rooms', icon: BedDouble },
+  { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+  { href: '/media', label: 'Media Library', icon: ImagePlus },
+  { href: '/bookings', label: 'Bookings', icon: CalendarDays },
+  { href: '/attractions', label: 'Attractions', icon: Map },
+  { href: '/reviews', label: 'Reviews', icon: Star },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -27,9 +28,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   React.useEffect(() => {
     if (!isLoading && (!adminMe?.authenticated || error)) {
-      setLocation('/admin/login');
+      window.location.href = '/admin/login';
     }
-  }, [adminMe, isLoading, error, setLocation]);
+  }, [adminMe, isLoading, error]);
 
   if (isLoading || !adminMe?.authenticated) {
     return <div className="min-h-screen flex items-center justify-center bg-muted/20">Loading...</div>;
@@ -39,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     try {
       await logout.mutateAsync();
       toast({ title: "Logged out successfully" });
-      setLocation('/admin/login');
+      window.location.href = '/admin/login';
     } catch (err) {
       toast({ title: "Failed to log out", variant: "destructive" });
     }
@@ -55,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
       <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = location === item.href || (location.startsWith(item.href) && item.href !== '/admin');
+          const isActive = location === item.href || (location.startsWith(item.href) && item.href !== '/');
           return (
             <Link 
               key={item.href} 

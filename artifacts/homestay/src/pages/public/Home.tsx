@@ -7,8 +7,11 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const { data: settings } = useGetSettings();
-  const { data: rooms } = useListRooms();
-  const { data: reviews } = useListReviews();
+const { data: rooms } = useListRooms();
+
+console.log("ROOMS =", rooms);
+
+const { data: reviews } = useListReviews();
   const [reviewStart, setReviewStart] = React.useState(0);
 
   const visibleRooms = rooms?.filter(r => r.isVisible) || [];
@@ -33,8 +36,35 @@ export default function Home() {
     return () => window.clearInterval(interval);
   }, [visibleReviews.length, reviewPageCount]);
 
+  const hotelSchema = {
+    "@context": "https://schema.org",
+    "@type": "Hotel",
+    "name": "Neel Kamal Homestay",
+    "description": settings?.tagline || "Neel Kamal Homestay · KASAULI — a premium boutique homestay in Himachal Pradesh.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Kasauli",
+      "addressRegion": "Himachal Pradesh",
+      "addressCountry": "IN"
+    },
+    "telephone": settings?.contactPhone || "+91-XXXXXXXXXX",
+    "email": settings?.contactEmail || "info@neelkamalhomestay.com",
+    "url": "https://neelkamalhomestay.com",
+    "image": settings?.heroImageUrl || "",
+    "priceRange": "₹₹",
+    "starRating": {
+      "@type": "Rating",
+      "ratingValue": "5"
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Inject Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelSchema) }}
+      />
       {/* Hero Section */}
       <section className="relative min-h-[88vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden">
         {settings?.heroVisible !== false && settings?.heroImageUrl ? (

@@ -136,7 +136,7 @@ export default function Rooms() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Link href={`/admin/rooms/${room.id}/images`}>
+                      <Link href={`/rooms/${room.id}/images`}>
                         <Button variant="outline" size="sm" title="Manage Images">
                           <ImageIcon className="w-4 h-4" />
                         </Button>

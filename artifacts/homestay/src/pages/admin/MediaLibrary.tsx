@@ -26,11 +26,7 @@ export default function MediaLibrary() {
     if (!file) return;
 
     try {
-      // Need to cast to any for FormData usage with orval mutation
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      await upload.mutateAsync({ data: formData as any });
+      await upload.mutateAsync({ data: { file } });
       queryClient.invalidateQueries({ queryKey: ['/api/media'] });
       toast({ title: "Media uploaded successfully" });
     } catch {

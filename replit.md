@@ -12,7 +12,7 @@ A premium boutique homestay website with a full Admin CMS for Neel Kamal Homesta
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
 - Required env: `SESSION_SECRET` — Session signing secret
-- Optional env: `ADMIN_PASSWORD` — Admin dashboard password (default: `admin1234`)
+- Required env: `ADMIN_PASSWORD` — Admin dashboard password
 
 ## Stack
 
@@ -50,7 +50,7 @@ A premium boutique homestay website with a full Admin CMS for Neel Kamal Homesta
 
 - No hardcoded images — all content managed through Admin Dashboard
 - Website must work with empty gallery/no room images (elegant placeholders)
-- Admin password: check `ADMIN_PASSWORD` env var (default: `admin1234`)
+- Admin password: set via `ADMIN_PASSWORD` env var (required)
 
 ## Gotchas
 

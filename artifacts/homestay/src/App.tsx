@@ -39,25 +39,27 @@ const queryClient = new QueryClient({
   },
 });
 
+
 function Router() {
   return (
     <Switch>
       {/* Admin Login Route (No Layout) */}
       <Route path="/admin/login" component={AdminLogin} />
 
+
       {/* Admin Routes with Layout */}
-      <Route path="/admin/*">
+      <Route path="/admin" nest>
         <AdminLayout>
           <Switch>
-            <Route path="/admin" component={Dashboard} />
-            <Route path="/admin/rooms" component={AdminRooms} />
-            <Route path="/admin/rooms/:id/images" component={RoomImages} />
-            <Route path="/admin/gallery" component={AdminGallery} />
-            <Route path="/admin/media" component={MediaLibrary} />
-            <Route path="/admin/bookings" component={Bookings} />
-            <Route path="/admin/attractions" component={AdminAttractions} />
-            <Route path="/admin/reviews" component={Reviews} />
-            <Route path="/admin/settings" component={Settings} />
+            <Route path="/" component={Dashboard} />
+            <Route path="/rooms" component={AdminRooms} />
+            <Route path="/rooms/:id/images" component={RoomImages} />
+            <Route path="/gallery" component={AdminGallery} />
+            <Route path="/media" component={MediaLibrary} />
+            <Route path="/bookings" component={Bookings} />
+            <Route path="/attractions" component={AdminAttractions} />
+            <Route path="/reviews" component={Reviews} />
+            <Route path="/settings" component={Settings} />
             <Route component={NotFound} />
           </Switch>
         </AdminLayout>

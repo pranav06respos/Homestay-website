@@ -53,3 +53,22 @@ Homestay-website-main/
 server/
 packages/
 @workspace
+
+# Local environment variables and secrets
+.env
+**/.env
+.env.local
+.env.*.local
+
+# Temporary cookie storage
+**/cookie.txt
+
+# Dynamic runtime media uploads
+**/uploads/
+
+# In-place compiled JS artifacts from TypeScript compilation in source directories
+artifacts/homestay/src/**/*.js
+artifacts/homestay/src/**/*.js.map
+
+# Local replit pnpm binary
+/pnpm

@@ -3,10 +3,30 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import path from "path";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
+
+// Security Headers via Helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disabled for dev proxying & dynamic previews compatibility
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+// Rate Limiter: Max 500 requests per 15 minutes per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Limit each IP to 500 requests per `window`
+  standardHeaders: true, // Return standard rate limit info headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: { error: "Too many requests from this IP, please try again later." },
+});
+app.use("/api", apiLimiter);
 
 const configuredDomains = [
   process.env.REPLIT_DEV_DOMAIN,

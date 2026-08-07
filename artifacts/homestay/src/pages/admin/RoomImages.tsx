@@ -61,7 +61,7 @@ export default function RoomImages() {
 
   return (
     <div className="space-y-8">
-      <Link href="/admin/rooms" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+      <Link href="/rooms" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
         <ChevronLeft className="w-4 h-4 mr-1" /> Back to Rooms
       </Link>
       
