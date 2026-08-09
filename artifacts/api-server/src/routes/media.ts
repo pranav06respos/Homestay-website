@@ -63,14 +63,20 @@ function parseId(raw: string | string[]): number {
 
 // GET /media
 router.get("/media", requireAdmin, async (req, res): Promise<void> => {
-  let query = db.select().from(mediaTable).$dynamic();
+  try {
+    let query = db.select().from(mediaTable).$dynamic();
 
-  if (req.query.search) {
-    query = query.where(ilike(mediaTable.originalName, `%${req.query.search}%`));
+    if (req.query.search) {
+      query = query.where(ilike(mediaTable.originalName, `%${req.query.search}%`));
+    }
+
+    const media = await query.orderBy(mediaTable.createdAt);
+    // Safely convert createdAt — Supabase may return string or Date object
+    res.json(media.map((m) => ({ ...m, url: normalizeMediaUrl(m.url), createdAt: m.createdAt ? new Date(m.createdAt).toISOString() : null })));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load media", details: message });
   }
-
-  const media = await query.orderBy(mediaTable.createdAt);
-  res.json(media.map((m) => ({ ...m, url: normalizeMediaUrl(m.url), createdAt: m.createdAt.toISOString() })));
 });
 
 // POST /media/upload

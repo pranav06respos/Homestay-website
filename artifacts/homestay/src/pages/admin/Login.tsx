@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocation } from 'wouter';
 import { useAdminLogin } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -14,7 +13,6 @@ const loginSchema = z.object({
 });
 
 export default function AdminLogin() {
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const login = useAdminLogin();
 
@@ -28,7 +26,11 @@ export default function AdminLogin() {
       const res = await login.mutateAsync({ data: { password: values.password } });
       if (res.authenticated) {
         toast({ title: "Logged in successfully" });
-        setLocation('/admin');
+        // Use full page navigation so the browser fully commits the session
+        // cookie before AdminLayout fires the auth check. This fixes mobile
+        // (iPhone Safari / Chrome Android) where setLocation() triggers a
+        // client-side render before the Set-Cookie header is persisted.
+        window.location.href = '/admin';
       } else {
         toast({ title: "Invalid password", variant: "destructive" });
       }

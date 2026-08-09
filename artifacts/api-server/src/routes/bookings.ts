@@ -30,9 +30,14 @@ async function bookingWithRoom(b: typeof bookingsTable.$inferSelect) {
 
 // GET /bookings
 router.get("/bookings", requireAdmin, async (req, res): Promise<void> => {
-  const bookings = await db.select().from(bookingsTable).orderBy(desc(bookingsTable.createdAt));
-  const result = await Promise.all(bookings.map(bookingWithRoom));
-  res.json(result);
+  try {
+    const bookings = await db.select().from(bookingsTable).orderBy(desc(bookingsTable.createdAt));
+    const result = await Promise.all(bookings.map(bookingWithRoom));
+    res.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load bookings", details: message });
+  }
 });
 
 // POST /bookings
@@ -48,8 +53,13 @@ router.post("/bookings", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Check-out must be after check-in" });
     return;
   }
-  const [booking] = await db.insert(bookingsTable).values({ ...parsed.data, status: "pending" }).returning();
-  res.status(201).json(await bookingWithRoom(booking));
+  try {
+    const [booking] = await db.insert(bookingsTable).values({ ...parsed.data, status: "pending" }).returning();
+    res.status(201).json(await bookingWithRoom(booking));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to create booking", details: message });
+  }
 });
 
 // PATCH /bookings/:id/status

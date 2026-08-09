@@ -36,33 +36,39 @@ async function roomWithCover(room: typeof roomsTable.$inferSelect) {
     ...room,
     pricePerNight: room.pricePerNight ? parseFloat(String(room.pricePerNight)) : null,
     coverImageUrl: cover?.url?.startsWith("http") ? new URL(cover.url).pathname : (cover?.url ?? null),
-    createdAt: room.createdAt.toISOString(),
-    updatedAt: room.updatedAt.toISOString(),
+    // Safely convert — Supabase may return string or Date object
+    createdAt: room.createdAt ? new Date(room.createdAt).toISOString() : null,
+    updatedAt: room.updatedAt ? new Date(room.updatedAt).toISOString() : null,
   };
 }
 
 // GET /rooms
 router.get("/rooms", async (req, res): Promise<void> => {
-  const isAdmin = req.query.admin === "true";
-  if (isAdmin) {
-    const session = req.session as { admin?: boolean };
-    if (!session.admin) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+  try {
+    const isAdmin = req.query.admin === "true";
+    if (isAdmin) {
+      const session = req.session as { admin?: boolean };
+      if (!session.admin) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
     }
+    let rooms;
+    if (isAdmin) {
+      rooms = await db.select().from(roomsTable).orderBy(roomsTable.sortOrder);
+    } else {
+      rooms = await db
+        .select()
+        .from(roomsTable)
+        .where(eq(roomsTable.isVisible, true))
+        .orderBy(roomsTable.sortOrder);
+    }
+    const result = await Promise.all(rooms.map(roomWithCover));
+    res.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load rooms", details: message });
   }
-  let rooms;
-  if (isAdmin) {
-    rooms = await db.select().from(roomsTable).orderBy(roomsTable.sortOrder);
-  } else {
-    rooms = await db
-      .select()
-      .from(roomsTable)
-      .where(eq(roomsTable.isVisible, true))
-      .orderBy(roomsTable.sortOrder);
-  }
-  const result = await Promise.all(rooms.map(roomWithCover));
-  res.json(result);
 });
 
 // POST /rooms

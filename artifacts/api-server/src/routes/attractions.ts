@@ -19,25 +19,30 @@ function parseId(raw: string | string[]): number {
 
 // GET /attractions
 router.get("/attractions", async (req, res): Promise<void> => {
-  const isAdmin = req.query.admin === "true";
-  if (isAdmin) {
-    const session = req.session as { admin?: boolean };
-    if (!session.admin) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+  try {
+    const isAdmin = req.query.admin === "true";
+    if (isAdmin) {
+      const session = req.session as { admin?: boolean };
+      if (!session.admin) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
     }
+    let items;
+    if (isAdmin) {
+      items = await db.select().from(attractionsTable).orderBy(asc(attractionsTable.sortOrder));
+    } else {
+      items = await db
+        .select()
+        .from(attractionsTable)
+        .where(eq(attractionsTable.isVisible, true))
+        .orderBy(asc(attractionsTable.sortOrder));
+    }
+    res.json(items);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load attractions", details: message });
   }
-  let items;
-  if (isAdmin) {
-    items = await db.select().from(attractionsTable).orderBy(asc(attractionsTable.sortOrder));
-  } else {
-    items = await db
-      .select()
-      .from(attractionsTable)
-      .where(eq(attractionsTable.isVisible, true))
-      .orderBy(asc(attractionsTable.sortOrder));
-  }
-  res.json(items);
 });
 
 // POST /attractions

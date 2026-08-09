@@ -18,23 +18,29 @@ function parseId(raw: string | string[]): number {
 }
 
 function formatReview(r: typeof reviewsTable.$inferSelect) {
-  return { ...r, createdAt: r.createdAt.toISOString() };
+  // Safely convert — Supabase may return string or Date object
+  return { ...r, createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : null };
 }
 
 // GET /reviews
 router.get("/reviews", async (req, res): Promise<void> => {
-  const isAdmin = req.query.admin === "true";
-  let items;
-  if (isAdmin) {
-    items = await db.select().from(reviewsTable).orderBy(desc(reviewsTable.createdAt));
-  } else {
-    items = await db
-      .select()
-      .from(reviewsTable)
-      .where(eq(reviewsTable.isVisible, true))
-      .orderBy(desc(reviewsTable.createdAt));
+  try {
+    const isAdmin = req.query.admin === "true";
+    let items;
+    if (isAdmin) {
+      items = await db.select().from(reviewsTable).orderBy(desc(reviewsTable.createdAt));
+    } else {
+      items = await db
+        .select()
+        .from(reviewsTable)
+        .where(eq(reviewsTable.isVisible, true))
+        .orderBy(desc(reviewsTable.createdAt));
+    }
+    res.json(items.map(formatReview));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load reviews", details: message });
   }
-  res.json(items.map(formatReview));
 });
 
 // POST /reviews
@@ -44,8 +50,13 @@ router.post("/reviews", requireAdmin, async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [item] = await db.insert(reviewsTable).values(parsed.data).returning();
-  res.status(201).json(formatReview(item));
+  try {
+    const [item] = await db.insert(reviewsTable).values(parsed.data).returning();
+    res.status(201).json(formatReview(item));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to create review", details: message });
+  }
 });
 
 // PUT /reviews/:id

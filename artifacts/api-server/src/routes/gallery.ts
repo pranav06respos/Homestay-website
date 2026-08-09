@@ -25,32 +25,38 @@ async function galleryWithMedia(item: typeof galleryTable.$inferSelect) {
     url: media?.url?.startsWith("http") ? new URL(media.url).pathname : (media?.url ?? ""),
     altText: media?.altText ?? null,
     filename: media?.filename ?? "",
-    createdAt: item.createdAt.toISOString(),
+    // Safely convert — Supabase may return string or Date object
+    createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : null,
   };
 }
 
 // GET /gallery
 router.get("/gallery", async (req, res): Promise<void> => {
-  const isAdmin = req.query.admin === "true";
-  if (isAdmin) {
-    const session = req.session as { admin?: boolean };
-    if (!session.admin) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+  try {
+    const isAdmin = req.query.admin === "true";
+    if (isAdmin) {
+      const session = req.session as { admin?: boolean };
+      if (!session.admin) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
     }
+    let items;
+    if (isAdmin) {
+      items = await db.select().from(galleryTable).orderBy(asc(galleryTable.sortOrder));
+    } else {
+      items = await db
+        .select()
+        .from(galleryTable)
+        .where(eq(galleryTable.isVisible, true))
+        .orderBy(asc(galleryTable.sortOrder));
+    }
+    const result = await Promise.all(items.map(galleryWithMedia));
+    res.json(result);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to load gallery", details: message });
   }
-  let items;
-  if (isAdmin) {
-    items = await db.select().from(galleryTable).orderBy(asc(galleryTable.sortOrder));
-  } else {
-    items = await db
-      .select()
-      .from(galleryTable)
-      .where(eq(galleryTable.isVisible, true))
-      .orderBy(asc(galleryTable.sortOrder));
-  }
-  const result = await Promise.all(items.map(galleryWithMedia));
-  res.json(result);
 });
 
 // POST /gallery
