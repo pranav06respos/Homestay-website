@@ -10,6 +10,8 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+app.set("trust proxy", 1);
+
 // Security Headers via Helmet
 app.use(
   helmet({
@@ -41,8 +43,12 @@ const allowedOrigins = new Set([
     `https://${domain.replace(/^https?:\/\//, "")}`,
     `http://${domain.replace(/^https?:\/\//, "")}`,
   ]),
+
   "http://localhost:3000",
   "http://localhost:5173",
+
+  "https://neelkamalhomestaykasauli.in",
+  "https://www.neelkamalhomestaykasauli.in",
 ]);
 
 function isAllowedOrigin(origin: string): boolean {
