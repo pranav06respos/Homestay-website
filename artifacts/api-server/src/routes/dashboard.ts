@@ -58,8 +58,14 @@ router.get("/dashboard/stats", requireAdmin, async (req, res): Promise<void> => 
       recentBookings,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    res.status(500).json({ error: "Failed to load dashboard stats", details: message });
+    console.error("[dashboard/stats] DB error:", err);
+    const e = err as Record<string, unknown>;
+    res.status(500).json({
+      error: "Failed to load dashboard stats",
+      details: e["message"] as string,
+      code: e["code"],
+      hint: e["hint"],
+    });
   }
 });
 

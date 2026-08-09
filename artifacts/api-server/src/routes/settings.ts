@@ -59,8 +59,14 @@ router.get("/settings", async (req, res): Promise<void> => {
     const [settings] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, false));
     res.json(await withResolvedMediaUrls(settings));
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    res.status(500).json({ error: "Failed to load settings", details: message });
+    console.error("[settings GET] DB error:", err);
+    const e = err as Record<string, unknown>;
+    res.status(500).json({
+      error: "Failed to load settings",
+      details: e["message"] as string,
+      code: e["code"],
+      hint: e["hint"],
+    });
   }
 });
 
