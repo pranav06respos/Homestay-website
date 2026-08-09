@@ -10,7 +10,7 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-app.set("trust proxy", 1);
+app.set("trust proxy", true);
 
 // Security Headers via Helmet
 app.use(
@@ -27,6 +27,14 @@ const apiLimiter = rateLimit({
   standardHeaders: true, // Return standard rate limit info headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: { error: "Too many requests from this IP, please try again later." },
+  keyGenerator: (req) => {
+    // Under Cloudflare, prioritize CF-Connecting-IP
+    const cfIp = req.headers["cf-connecting-ip"];
+    if (typeof cfIp === "string") return cfIp;
+    
+    // Fall back to Express trust proxy req.ip (which correctly parses X-Forwarded-For)
+    return req.ip || "";
+  },
 });
 app.use("/api", apiLimiter);
 
@@ -52,7 +60,8 @@ const allowedOrigins = new Set([
 ]);
 
 function isAllowedOrigin(origin: string): boolean {
-  if (allowedOrigins.has(origin)) {
+  const normalized = origin.toLowerCase().trim();
+  if (allowedOrigins.has(normalized)) {
     return true;
   }
 
@@ -93,9 +102,9 @@ app.use(
     origin(origin, callback) {
       if (!origin || isAllowedOrigin(origin)) {
         callback(null, true);
-        return;
+      } else {
+        callback(null, false);
       }
-      callback(new Error("Origin not allowed"));
     },
     credentials: true,
   }),
