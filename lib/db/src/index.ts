@@ -35,16 +35,19 @@ function resolveIPv4Pooler(callback: (ip: string) => void) {
   });
 }
 
-const customLookup = (hostname: string, options: any, callback: any) => {
+const customLookup = (hostname: string, options: any, callback?: any) => {
+  const cb = typeof options === "function" ? options : callback;
+  const opts = typeof options === "function" ? {} : options;
+
   // If Node is attempting to connect to a direct Supabase host (which has IPv6 AAAA only),
-  // route the TCP connection via Supabase's IPv4 pooler gateway while preserving the TLS SNI header.
+  // route the TCP connection via Supabase's IPv4 pooler gateway (65.0.195.55) while preserving the TLS SNI header.
   if (hostname.includes("supabase.co") || hostname.includes("supabase.com")) {
-    resolveIPv4Pooler((ip) => {
-      callback(null, ip, 4);
-    });
-  } else {
-    dns.lookup(hostname, options, callback);
+    if (typeof cb === "function") {
+      cb(null, "65.0.195.55", 4);
+      return;
+    }
   }
+  dns.lookup(hostname, opts, cb);
 };
 
 const poolConfig: pg.PoolConfig & { lookup?: any } = {
