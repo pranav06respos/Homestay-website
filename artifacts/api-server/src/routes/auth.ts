@@ -26,7 +26,13 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   const session = req.session as { admin?: boolean };
   session.admin = true;
 
-  res.json({ authenticated: true, message: "Logged in successfully" });
+  req.session.save((err) => {
+    if (err) {
+      res.status(500).json({ error: "Failed to save session" });
+      return;
+    }
+    res.json({ authenticated: true, message: "Logged in successfully" });
+  });
 });
 
 router.post("/auth/logout", async (req, res): Promise<void> => {

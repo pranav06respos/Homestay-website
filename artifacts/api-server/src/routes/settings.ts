@@ -122,8 +122,17 @@ router.put("/settings", requireAdmin, async (req, res): Promise<void> => {
 
     res.json(updated);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    res.status(500).json({ error: "Failed to save draft settings", details: message });
+    console.error("[PUT /settings] DB error full object:", err);
+    console.error("[PUT /settings] DB error cause:", (err as any)?.cause);
+    console.error("[PUT /settings] DB error JSON:", JSON.stringify(err, null, 2));
+    const e = err as Record<string, unknown>;
+    res.status(500).json({
+      error: "Failed to save draft settings",
+      details: e["message"] as string || String(err),
+      code: e["code"],
+      hint: e["hint"],
+      cause: String(e["cause"] || ""),
+    });
   }
 });
 
