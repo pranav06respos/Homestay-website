@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import dns from "node:dns";
 import * as schema from "./schema";
 
 const { Pool } = pg;
@@ -10,23 +11,49 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Parse the DATABASE_URL to determine SSL requirements.
-// Supabase (and most cloud Postgres providers) require SSL from external hosts
-// such as Render. Without this, connections from Render receive:
-//   "no pg_hba.conf entry for host ... SSL off"
-// or "SSL connection is required".
-// We enable SSL with rejectUnauthorized: false so self-signed or Supabase-managed
-// certificates are accepted. This is safe for Supabase because the connection is
-// still encrypted — rejectUnauthorized only skips CA chain validation.
-const poolConfig: pg.PoolConfig = { connectionString: process.env.DATABASE_URL };
+// Fallback pooler IPs for Supabase IPv4 compatibility on cloud hosts (like Render)
+// that lack outbound IPv6 routing.
+const SUPABASE_IPV4_FALLBACKS = [
+  "65.0.195.55",    // ap-south-1 (Mumbai)
+  "44.208.221.186", // us-east-1 (N. Virginia)
+  "18.198.30.239",  // eu-central-1 (Frankfurt)
+];
 
-// Apply SSL unless the URL explicitly disables it via ?sslmode=disable
-const disableSSL = process.env.DATABASE_URL.includes("sslmode=disable");
-if (!disableSSL) {
-  poolConfig.ssl = { rejectUnauthorized: false };
+let cachedPoolerIp: string | null = null;
+
+function resolveIPv4Pooler(callback: (ip: string) => void) {
+  if (cachedPoolerIp) {
+    return callback(cachedPoolerIp);
+  }
+  dns.resolve4("aws-0-ap-south-1.pooler.supabase.com", (err, addresses) => {
+    if (!err && addresses && addresses.length > 0) {
+      cachedPoolerIp = addresses[0];
+    } else {
+      cachedPoolerIp = SUPABASE_IPV4_FALLBACKS[0];
+    }
+    callback(cachedPoolerIp);
+  });
 }
 
-export const pool = new Pool(poolConfig);
+const customLookup = (hostname: string, options: any, callback: any) => {
+  // If Node is attempting to connect to a direct Supabase host (which has IPv6 AAAA only),
+  // route the TCP connection via Supabase's IPv4 pooler gateway while preserving the TLS SNI header.
+  if (hostname.includes("supabase.co") || hostname.includes("supabase.com")) {
+    resolveIPv4Pooler((ip) => {
+      callback(null, ip, 4);
+    });
+  } else {
+    dns.lookup(hostname, options, callback);
+  }
+};
+
+const poolConfig: pg.PoolConfig & { lookup?: any } = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  lookup: customLookup,
+};
+
+export const pool = new Pool(poolConfig as any);
 
 // Log connection errors immediately so Render logs show the exact Postgres error.
 pool.on("error", (err) => {
@@ -37,3 +64,4 @@ pool.on("error", (err) => {
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
+
