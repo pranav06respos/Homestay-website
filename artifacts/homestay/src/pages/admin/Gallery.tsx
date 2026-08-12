@@ -174,14 +174,14 @@ export default function GalleryManager() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteItemTarget} onOpenChange={(v) => !v && setDeleteItemTarget(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-lg p-6">
           <DialogHeader>
-            <DialogTitle className="font-serif text-xl">Delete Gallery Image</DialogTitle>
+            <DialogTitle className="font-serif text-2xl">Delete Gallery Image</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground my-2">
+          <p className="text-sm text-muted-foreground my-3 leading-relaxed">
             Choose whether to remove this image from the public gallery only, or permanently delete the file and record from database storage.
           </p>
-          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:justify-end mt-4">
+          <DialogFooter className="flex flex-col sm:flex-row gap-2.5 sm:justify-end mt-4 pt-2 border-t border-border">
             <Button variant="outline" onClick={() => setDeleteItemTarget(null)}>
               Cancel
             </Button>
