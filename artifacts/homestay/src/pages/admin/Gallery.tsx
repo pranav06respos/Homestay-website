@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   useListGallery, useAddGalleryItem, useUpdateGalleryItem, 
-  useDeleteGalleryItem, useReorderGallery, useListMedia 
+  useDeleteGalleryItem, useReorderGallery, useListMedia, useDeleteMedia 
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -15,12 +15,14 @@ export default function GalleryManager() {
   const { data: galleryItems, isLoading } = useListGallery({ admin: 'true' });
   const updateItem = useUpdateGalleryItem();
   const deleteItem = useDeleteGalleryItem();
+  const deleteMedia = useDeleteMedia();
   const reorder = useReorderGallery();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isMediaPickerOpen, setIsMediaPickerOpen] = React.useState(false);
-  
+  const [deleteItemTarget, setDeleteItemTarget] = React.useState<{ id: number; mediaId: number } | null>(null);
+
   const sortedItems = [...(galleryItems || [])].sort((a, b) => a.sortOrder - b.sortOrder);
 
   const handleToggleVisible = async (id: number, current: boolean) => {
@@ -43,15 +45,31 @@ export default function GalleryManager() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm("Remove this image from the gallery?")) {
-      try {
-        await deleteItem.mutateAsync({ id });
-        queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
-        toast({ title: "Removed from gallery" });
-      } catch {
-        toast({ title: "Delete failed", variant: "destructive" });
-      }
+  const handleConfirmDeleteGalleryOnly = async () => {
+    if (!deleteItemTarget) return;
+    try {
+      await deleteItem.mutateAsync({ id: deleteItemTarget.id });
+      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      toast({ title: "Removed from gallery" });
+    } catch {
+      toast({ title: "Delete failed", variant: "destructive" });
+    } finally {
+      setDeleteItemTarget(null);
+    }
+  };
+
+  const handleConfirmDeletePermanent = async () => {
+    if (!deleteItemTarget) return;
+    try {
+      await deleteItem.mutateAsync({ id: deleteItemTarget.id });
+      await deleteMedia.mutateAsync({ id: deleteItemTarget.mediaId });
+      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/media'] });
+      toast({ title: "Permanently deleted image and media record" });
+    } catch {
+      toast({ title: "Delete failed", variant: "destructive" });
+    } finally {
+      setDeleteItemTarget(null);
     }
   };
 
@@ -139,8 +157,13 @@ export default function GalleryManager() {
                   <Switch checked={item.isFeatured} onCheckedChange={() => handleToggleFeatured(item.id, item.isFeatured)} />
                 </div>
                 <div className="mt-auto pt-4 border-t border-border flex justify-end">
-                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(item.id)}>
-                    <Trash2 className="w-4 h-4 mr-2" /> Remove
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10" 
+                    onClick={() => setDeleteItemTarget({ id: item.id, mediaId: item.mediaId })}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </Button>
                 </div>
               </div>
@@ -148,6 +171,29 @@ export default function GalleryManager() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteItemTarget} onOpenChange={(v) => !v && setDeleteItemTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">Delete Gallery Image</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground my-2">
+            Choose whether to remove this image from the public gallery only, or permanently delete the file and record from database storage.
+          </p>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:justify-end mt-4">
+            <Button variant="outline" onClick={() => setDeleteItemTarget(null)}>
+              Cancel
+            </Button>
+            <Button variant="secondary" onClick={handleConfirmDeleteGalleryOnly}>
+              Remove from Gallery
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDeletePermanent}>
+              Delete Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <MediaPickerDialog 
         open={isMediaPickerOpen} 

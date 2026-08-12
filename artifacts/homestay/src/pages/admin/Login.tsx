@@ -26,10 +26,8 @@ export default function AdminLogin() {
       const res = await login.mutateAsync({ data: { password: values.password } });
       if (res.authenticated) {
         toast({ title: "Logged in successfully" });
-        // Use full page navigation so the browser fully commits the session
-        // cookie before AdminLayout fires the auth check. This fixes mobile
-        // (iPhone Safari / Chrome Android) where setLocation() triggers a
-        // client-side render before the Set-Cookie header is persisted.
+        // Ensure browser cookie engine commits Set-Cookie header to cookie store before full-page redirect
+        await new Promise((resolve) => setTimeout(resolve, 150));
         window.location.href = '/admin';
       } else {
         toast({ title: "Invalid password", variant: "destructive" });
