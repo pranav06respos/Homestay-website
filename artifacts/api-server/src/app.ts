@@ -3,8 +3,11 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import path from "path";
+import fs from "fs";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { eq } from "drizzle-orm";
+import { db, mediaTable } from "@workspace/db";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -133,9 +136,27 @@ app.use(
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 app.use("/api/uploads", express.static(UPLOADS_DIR));
 
-// Fallback for missing uploaded files: redirect to default homestay image so thumbnails never break
-app.use("/api/uploads/:filename", (_req, res) => {
-  res.redirect(302, "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80");
+// Retrieve uploaded files from local disk or reconstitute from PostgreSQL database store
+app.use("/api/uploads/:filename", async (req, res): Promise<void> => {
+  try {
+    const filename = req.params.filename;
+    const [media] = await db.select().from(mediaTable).where(eq(mediaTable.filename, filename));
+
+    if (media && media.data) {
+      const buffer = Buffer.from(media.data, "base64");
+      // Cache file back to local disk
+      const filePath = path.join(UPLOADS_DIR, filename);
+      if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+      fs.writeFileSync(filePath, buffer);
+
+      res.contentType(media.mimeType).send(buffer);
+      return;
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to retrieve persistent media from database");
+  }
+
+  res.status(404).send("File not found");
 });
 
 app.use("/api", router);

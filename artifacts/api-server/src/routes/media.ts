@@ -90,6 +90,10 @@ router.post("/media/upload", requireAdmin, upload.single("file"), async (req, re
   const url = `/api/uploads/${req.file.filename}`;
   const altText = req.body.altText as string | undefined;
 
+  // Read file data into Base64 for persistent database storage in PostgreSQL
+  const fileBuffer = fs.readFileSync(req.file.path);
+  const base64Data = fileBuffer.toString("base64");
+
   const [media] = await db
     .insert(mediaTable)
     .values({
@@ -99,6 +103,7 @@ router.post("/media/upload", requireAdmin, upload.single("file"), async (req, re
       mimeType: req.file.mimetype,
       sizeBytes: req.file.size,
       altText: altText ?? null,
+      data: base64Data,
       usedIn: [],
     })
     .returning();

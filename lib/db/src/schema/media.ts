@@ -12,6 +12,7 @@ export const mediaTable = pgTable("media", {
   width: integer("width"),
   height: integer("height"),
   altText: text("alt_text"),
+  data: text("data"),
   usedIn: text("used_in").array().notNull().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
