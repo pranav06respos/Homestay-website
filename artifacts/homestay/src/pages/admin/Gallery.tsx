@@ -104,7 +104,14 @@ export default function GalleryManager() {
           {sortedItems.map((item, index) => (
             <div key={item.id} className="bg-card border border-border rounded-sm overflow-hidden flex flex-col">
               <div className="aspect-[4/3] bg-muted relative group">
-                <img src={item.url} alt={item.altText || 'Gallery image'} className="w-full h-full object-cover" />
+                <img 
+                  src={item.url} 
+                  alt={item.altText || 'Gallery image'} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+                  }}
+                />
                 
                 {item.isFeatured && (
                   <div className="absolute top-2 left-2 bg-yellow-500 text-white p-1.5 rounded-full shadow-sm">
@@ -227,7 +234,14 @@ function MediaPickerDialog({ open, onOpenChange, existingMediaIds }: { open: boo
                     className={`relative aspect-square cursor-pointer border-2 rounded-sm overflow-hidden ${isSelected ? 'border-primary' : 'border-transparent hover:border-primary/50'}`}
                     onClick={() => toggleSelect(media.id)}
                   >
-                    <img src={media.url} alt="" className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} />
+                    <img 
+                      src={media.url} 
+                      alt="" 
+                      className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+                      }}
+                    />
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
                         <Check className="w-4 h-4" />

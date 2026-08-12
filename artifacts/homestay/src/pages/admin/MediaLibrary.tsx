@@ -132,6 +132,9 @@ export default function MediaLibrary() {
                   alt={media.altText || media.filename} 
                   className={`w-full h-full object-cover cursor-pointer ${isSelected ? 'opacity-90 scale-95 rounded-sm' : ''}`}
                   onClick={() => toggleSelect(media.id)}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+                  }}
                 />
                 
                 {/* Selection Checkmark */}
@@ -202,7 +205,14 @@ function MediaPreviewDialog({ media, open, onOpenChange, onDelete }: { media: Me
       <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background">
         <div className="flex flex-col md:flex-row h-[70vh]">
           <div className="w-full md:w-2/3 bg-muted/30 flex items-center justify-center p-4 border-r border-border">
-            <img src={media.url} alt={media.altText || ''} className="max-w-full max-h-full object-contain drop-shadow-md" />
+            <img 
+              src={media.url} 
+              alt={media.altText || ''} 
+              className="max-w-full max-h-full object-contain drop-shadow-md" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+              }}
+            />
           </div>
           <div className="w-full md:w-1/3 p-6 flex flex-col bg-card">
             <DialogHeader className="mb-6">

@@ -124,7 +124,7 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: "lax",
     },
   }),
 );
@@ -132,6 +132,11 @@ app.use(
 // Serve uploaded files statically
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 app.use("/api/uploads", express.static(UPLOADS_DIR));
+
+// Fallback for missing uploaded files: redirect to default homestay image so thumbnails never break
+app.use("/api/uploads/:filename", (_req, res) => {
+  res.redirect(302, "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80");
+});
 
 app.use("/api", router);
 

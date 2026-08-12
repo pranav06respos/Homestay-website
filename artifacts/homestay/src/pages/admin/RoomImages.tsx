@@ -91,7 +91,14 @@ export default function RoomImages() {
           {sortedImages.map((image) => (
             <div key={image.id} className="bg-card border border-border rounded-sm overflow-hidden flex flex-col">
               <div className="aspect-[4/3] bg-muted relative group">
-                <img src={image.url} alt={image.altText || ''} className="w-full h-full object-cover" />
+                <img 
+                  src={image.url} 
+                  alt={image.altText || ''} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+                  }}
+                />
                 
                 {image.isCover && (
                   <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 text-xs font-medium uppercase tracking-wider rounded-sm shadow-sm flex items-center">
@@ -207,7 +214,14 @@ function RoomMediaPickerDialog({ roomId, open, onOpenChange, existingMediaIds }:
                     className={`relative aspect-square cursor-pointer border-2 rounded-sm overflow-hidden ${isSelected ? 'border-primary' : 'border-transparent hover:border-primary/50'}`}
                     onClick={() => toggleSelect(media.id)}
                   >
-                    <img src={media.url} alt="" className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} />
+                    <img 
+                      src={media.url} 
+                      alt="" 
+                      className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
+                      }}
+                    />
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
                         <Check className="w-4 h-4" />
