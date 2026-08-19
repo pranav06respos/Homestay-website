@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGetSettings, useListRooms, useListReviews } from '@workspace/api-client-react';
+import { useGetSettings, useListRooms, useListReviews, resolveMediaUrl } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { MapPin, Wifi, Car, Coffee, Tv, Wind, Check, Star, Church, Mountain, Trees, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -225,7 +225,7 @@ const { data: reviews } = useListReviews();
               <Link key={room.id} href={`/rooms/${room.slug}`} className="group block relative rounded-sm overflow-hidden bg-card border border-border transition-shadow hover:shadow-md">
                 <div className="aspect-[4/3] bg-muted relative overflow-hidden">
                   {room.coverImageUrl ? (
-                    <img src={room.coverImageUrl} alt={room.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={resolveMediaUrl(room.coverImageUrl)} alt={room.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50">
                       <Wind className="w-12 h-12 mb-2" />

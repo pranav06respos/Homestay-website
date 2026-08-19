@@ -1,5 +1,5 @@
 import React from 'react';
-import { useListRooms } from '@workspace/api-client-react';
+import { useListRooms, resolveMediaUrl } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Wind, Users, BedDouble } from 'lucide-react';
 
@@ -49,7 +49,7 @@ export default function Rooms() {
                 <div className="w-full md:w-[55%] aspect-[4/3] bg-muted relative overflow-hidden rounded-sm group">
                   {room.coverImageUrl ? (
                     <img 
-                      src={room.coverImageUrl} 
+                      src={resolveMediaUrl(room.coverImageUrl)} 
                       alt={room.name} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
                     />

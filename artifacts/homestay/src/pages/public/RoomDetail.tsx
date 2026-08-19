@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useParams } from 'wouter';
-import { useListRooms, useListRoomImages } from '@workspace/api-client-react';
+import { useListRooms, useListRoomImages, resolveMediaUrl } from '@workspace/api-client-react';
 import { Users, BedDouble, Wind, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
 
@@ -89,7 +89,7 @@ export default function RoomDetail() {
             {displayImages.length > 0 ? (
               <>
                 <img 
-                  src={displayImages[currentImageIdx].url} 
+                  src={resolveMediaUrl(displayImages[currentImageIdx].url)} 
                   alt={room.name}
                   className="w-full h-full object-cover"
                 />

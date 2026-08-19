@@ -1,5 +1,5 @@
 import React from 'react';
-import { useListGallery } from '@workspace/api-client-react';
+import { useListGallery, resolveMediaUrl } from '@workspace/api-client-react';
 import { Wind, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -39,11 +39,11 @@ export default function Gallery() {
                 type="button"
                 key={item.id} 
                 className="break-inside-avoid relative group cursor-pointer rounded-sm overflow-hidden bg-muted"
-                onClick={() => setSelectedImage(item.url)}
+                onClick={() => setSelectedImage(resolveMediaUrl(item.url))}
                 aria-label={`Open ${item.altText || 'gallery image'}`}
               >
                 <img 
-                  src={item.url} 
+                  src={resolveMediaUrl(item.url)} 
                   alt={item.altText || 'Gallery Image'} 
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
