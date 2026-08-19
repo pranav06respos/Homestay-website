@@ -30,6 +30,25 @@ export function setBaseUrl(url: string | null): void {
 }
 
 /**
+ * Returns the currently configured base URL (without trailing slash), or null.
+ */
+export function getBaseUrl(): string | null {
+  return _baseUrl;
+}
+
+/**
+ * Resolves a media URL returned by the backend (which may be a relative path
+ * like `/api/uploads/file.jpg`) to an absolute URL using the configured base URL.
+ * If the URL is already absolute or there is no base URL set, it is returned as-is.
+ */
+export function resolveMediaUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = _baseUrl || '';
+  return `${base}${url}`;
+}
+
+/**
  * Register a getter that supplies a bearer auth token.  Before every fetch
  * the getter is invoked; when it returns a non-null string, an
  * `Authorization: Bearer <token>` header is attached to the request.

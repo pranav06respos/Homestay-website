@@ -1,5 +1,5 @@
 import React from 'react';
-import { useListMedia, useUploadMedia, useDeleteMedia, useUpdateMediaUsage, useUpdateMedia, Media } from '@workspace/api-client-react';
+import { useListMedia, useUploadMedia, useDeleteMedia, useUpdateMediaUsage, useUpdateMedia, resolveMediaUrl, Media } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -128,7 +128,7 @@ export default function MediaLibrary() {
                 }`}
               >
                 <img 
-                  src={media.url} 
+                  src={resolveMediaUrl(media.url)} 
                   alt={media.altText || media.filename} 
                   className={`w-full h-full object-cover cursor-pointer ${isSelected ? 'opacity-90 scale-95 rounded-sm' : ''}`}
                   onClick={() => toggleSelect(media.id)}
@@ -203,7 +203,7 @@ function MediaPreviewDialog({ media, open, onOpenChange, onDelete }: { media: Me
         <div className="flex flex-col md:flex-row h-[70vh]">
           <div className="w-full md:w-2/3 bg-muted/30 flex items-center justify-center p-4 border-r border-border">
             <img 
-              src={media.url} 
+              src={resolveMediaUrl(media.url)} 
               alt={media.altText || ''} 
               className="max-w-full max-h-full object-contain drop-shadow-md" 
             />

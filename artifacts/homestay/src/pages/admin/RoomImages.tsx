@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useParams } from 'wouter';
 import { 
   useGetRoom, useListRoomImages, useSetRoomCoverImage, 
-  useRemoveRoomImage, useAddRoomImage, useListMedia 
+  useRemoveRoomImage, useAddRoomImage, useListMedia, resolveMediaUrl 
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -92,7 +92,7 @@ export default function RoomImages() {
             <div key={image.id} className="bg-card border border-border rounded-sm overflow-hidden flex flex-col">
               <div className="aspect-[4/3] bg-muted relative group">
                 <img 
-                  src={image.url} 
+                  src={resolveMediaUrl(image.url)} 
                   alt={image.altText || ''} 
                   className="w-full h-full object-cover" 
                 />
@@ -212,7 +212,7 @@ function RoomMediaPickerDialog({ roomId, open, onOpenChange, existingMediaIds }:
                     onClick={() => toggleSelect(media.id)}
                   >
                     <img 
-                      src={media.url} 
+                      src={resolveMediaUrl(media.url)} 
                       alt="" 
                       className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
                     />

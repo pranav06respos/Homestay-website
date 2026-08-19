@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   useListGallery, useAddGalleryItem, useUpdateGalleryItem, 
-  useDeleteGalleryItem, useReorderGallery, useListMedia, useDeleteMedia 
+  useDeleteGalleryItem, useReorderGallery, useListMedia, useDeleteMedia, resolveMediaUrl 
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -123,7 +123,7 @@ export default function GalleryManager() {
             <div key={item.id} className="bg-card border border-border rounded-sm overflow-hidden flex flex-col">
               <div className="aspect-[4/3] bg-muted relative group">
                 <img 
-                  src={item.url} 
+                  src={resolveMediaUrl(item.url)} 
                   alt={item.altText || 'Gallery image'} 
                   className="w-full h-full object-cover" 
                 />
@@ -278,7 +278,7 @@ function MediaPickerDialog({ open, onOpenChange, existingMediaIds }: { open: boo
                     onClick={() => toggleSelect(media.id)}
                   >
                     <img 
-                      src={media.url} 
+                      src={resolveMediaUrl(media.url)} 
                       alt="" 
                       className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
                     />
