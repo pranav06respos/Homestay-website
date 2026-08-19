@@ -10,7 +10,7 @@ router.get("/healthz", (_req, res) => {
 });
 
 router.get("/health", (_req, res) => {
-  res.json({ status: "ok", version: "v1.0.4-persistent-db-media", timestamp: new Date().toISOString() });
+  res.json({ status: "ok", version: "v1.0.5-unique-image-thumbnails", timestamp: new Date().toISOString() });
 });
 
 router.get("/db-debug", async (_req, res) => {

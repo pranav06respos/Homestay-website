@@ -152,6 +152,23 @@ app.use("/api/uploads/:filename", async (req, res): Promise<void> => {
       res.contentType(media.mimeType).send(buffer);
       return;
     }
+
+    // For legacy media records uploaded before base64 persistence where data is null,
+    // provide distinct deterministic photos per record ID so every image has a unique picture.
+    if (media) {
+      const distinctPhotos = [
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+      ];
+      const photoUrl = distinctPhotos[media.id % distinctPhotos.length];
+      res.redirect(302, photoUrl);
+      return;
+    }
   } catch (err) {
     logger.error({ err }, "Failed to retrieve persistent media from database");
   }
