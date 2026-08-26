@@ -9,7 +9,7 @@ import {
   DeleteAttractionParams,
   ToggleAttractionVisibleParams,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -22,9 +22,17 @@ router.get("/attractions", async (req, res): Promise<void> => {
   try {
     const isAdmin = req.query.admin === "true";
     if (isAdmin) {
-      const session = req.session as { admin?: boolean };
-      if (!session.admin) {
-        res.status(401).json({ error: "Unauthorized" });
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+      const token = authHeader.slice('Bearer '.length).trim();
+      try {
+        const payload = verifyToken(token) as { admin?: boolean };
+        if (!payload.admin) throw new Error('Not admin');
+      } catch (err) {
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
     }
@@ -46,7 +54,7 @@ router.get("/attractions", async (req, res): Promise<void> => {
 });
 
 // POST /attractions
-router.post("/attractions", requireAdmin, async (req, res): Promise<void> => {
+router.post("/attractions", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = CreateAttractionBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -57,7 +65,7 @@ router.post("/attractions", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PUT /attractions/:id
-router.put("/attractions/:id", requireAdmin, async (req, res): Promise<void> => {
+router.put("/attractions/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateAttractionParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -81,7 +89,7 @@ router.put("/attractions/:id", requireAdmin, async (req, res): Promise<void> => 
 });
 
 // DELETE /attractions/:id
-router.delete("/attractions/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/attractions/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = DeleteAttractionParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -92,7 +100,7 @@ router.delete("/attractions/:id", requireAdmin, async (req, res): Promise<void> 
 });
 
 // PATCH /attractions/:id/toggle-visible
-router.patch("/attractions/:id/toggle-visible", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/attractions/:id/toggle-visible", requireAdminJwt, async (req, res): Promise<void> => {
   const params = ToggleAttractionVisibleParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

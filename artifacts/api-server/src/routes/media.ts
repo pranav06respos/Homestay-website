@@ -10,7 +10,7 @@ import {
   UpdateMediaUsageParams,
   UpdateMediaUsageBody,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -62,7 +62,7 @@ function parseId(raw: string | string[]): number {
 }
 
 // GET /media
-router.get("/media", requireAdmin, async (req, res): Promise<void> => {
+router.get("/media", requireAdminJwt, async (req, res): Promise<void> => {
   try {
     let query = db.select().from(mediaTable).$dynamic();
 
@@ -80,7 +80,7 @@ router.get("/media", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // POST /media/upload
-router.post("/media/upload", requireAdmin, upload.single("file"), async (req, res): Promise<void> => {
+router.post("/media/upload", requireAdminJwt, upload.single("file"), async (req, res): Promise<void> => {
   if (!req.file) {
     res.status(400).json({ error: "No file uploaded" });
     return;
@@ -112,7 +112,7 @@ router.post("/media/upload", requireAdmin, upload.single("file"), async (req, re
 });
 
 // GET /media/:id
-router.get("/media/:id", requireAdmin, async (req, res): Promise<void> => {
+router.get("/media/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = GetMediaParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -127,7 +127,7 @@ router.get("/media/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PUT /media/:id
-router.put("/media/:id", requireAdmin, async (req, res): Promise<void> => {
+router.put("/media/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateMediaParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -151,7 +151,7 @@ router.put("/media/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // DELETE /media/:id
-router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/media/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = DeleteMediaParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -174,7 +174,7 @@ router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PATCH /media/:id/usage
-router.patch("/media/:id/usage", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/media/:id/usage", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateMediaUsageParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

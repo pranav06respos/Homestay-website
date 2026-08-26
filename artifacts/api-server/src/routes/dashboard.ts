@@ -2,12 +2,12 @@ import { Router } from "express";
 import type { IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
 import { db, roomsTable, bookingsTable, galleryTable, mediaTable, roomImagesTable } from "@workspace/db";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 import { count } from "drizzle-orm";
 
 const router: IRouter = Router();
 
-router.get("/dashboard/stats", requireAdmin, async (req, res): Promise<void> => {
+router.get("/dashboard/stats", requireAdminJwt, async (req, res): Promise<void> => {
   try {
     const [totalRoomsResult] = await db.select({ count: count() }).from(roomsTable);
     const [availableRoomsResult] = await db

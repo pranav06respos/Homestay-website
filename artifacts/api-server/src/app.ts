@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
-import session from "express-session";
+
 import path from "path";
 import fs from "fs";
 import helmet from "helmet";
@@ -20,6 +20,8 @@ app.use(
   helmet({
     contentSecurityPolicy: false, // Disabled for dev proxying & dynamic previews compatibility
     crossOriginEmbedderPolicy: false,
+    // Allow images/assets to be loaded cross-origin (Cloudflare frontend → Render backend)
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
@@ -116,22 +118,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || (() => {
-      throw new Error("SESSION_SECRET must be configured");
-    })(),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    },
-  }),
-);
+// Session middleware removed – JWT auth used instead
 
 // Serve uploaded files statically
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");

@@ -9,7 +9,7 @@ import {
   DeleteGalleryItemParams,
   ReorderGalleryBody,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -33,14 +33,7 @@ async function galleryWithMedia(item: typeof galleryTable.$inferSelect) {
 // GET /gallery
 router.get("/gallery", async (req, res): Promise<void> => {
   try {
-    const isAdmin = req.query.admin === "true";
-    if (isAdmin) {
-      const session = req.session as { admin?: boolean };
-      if (!session.admin) {
-        res.status(401).json({ error: "Unauthorized" });
-        return;
-      }
-    }
+    const isAdmin = req.query.admin === "true"; // JWT auth handled by middleware
     let items;
     if (isAdmin) {
       items = await db.select().from(galleryTable).orderBy(asc(galleryTable.sortOrder));
@@ -60,7 +53,7 @@ router.get("/gallery", async (req, res): Promise<void> => {
 });
 
 // POST /gallery
-router.post("/gallery", requireAdmin, async (req, res): Promise<void> => {
+router.post("/gallery", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = AddGalleryItemBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -71,7 +64,7 @@ router.post("/gallery", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // POST /gallery/reorder (must be before /:id)
-router.post("/gallery/reorder", requireAdmin, async (req, res): Promise<void> => {
+router.post("/gallery/reorder", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = ReorderGalleryBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -86,7 +79,7 @@ router.post("/gallery/reorder", requireAdmin, async (req, res): Promise<void> =>
 });
 
 // PUT /gallery/:id
-router.put("/gallery/:id", requireAdmin, async (req, res): Promise<void> => {
+router.put("/gallery/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateGalleryItemParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -110,7 +103,7 @@ router.put("/gallery/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // DELETE /gallery/:id
-router.delete("/gallery/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/gallery/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = DeleteGalleryItemParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

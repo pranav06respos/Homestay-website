@@ -3,10 +3,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAdminLogin } from '@workspace/api-client-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/authContext';
 
 const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
@@ -14,6 +16,8 @@ const loginSchema = z.object({
 
 export default function AdminLogin() {
   const { toast } = useToast();
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
   const login = useAdminLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -24,11 +28,12 @@ export default function AdminLogin() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
       const res = await login.mutateAsync({ data: { password: values.password } });
-      if (res.authenticated) {
+      if (res.authenticated && res.token) {
+        // Store JWT in memory — no cookies, no localStorage
+        setToken(res.token);
         toast({ title: "Logged in successfully" });
-        // Ensure browser cookie engine commits Set-Cookie header to cookie store before full-page redirect
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        window.location.href = '/admin';
+        // Use SPA navigation so AuthInitializer keeps the token getter wired
+        navigate('/admin');
       } else {
         toast({ title: "Invalid password", variant: "destructive" });
       }

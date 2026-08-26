@@ -3,7 +3,7 @@ import type { IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, settingsTable, mediaTable } from "@workspace/db";
 import { UpdateSettingsBody } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -79,7 +79,7 @@ router.get("/settings", async (req, res): Promise<void> => {
   }
 });
 
-router.get("/settings/draft", requireAdmin, async (req, res): Promise<void> => {
+router.get("/settings/draft", requireAdminJwt, async (req, res): Promise<void> => {
   try {
     await ensureSettings();
     const [draft] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, true));
@@ -90,7 +90,7 @@ router.get("/settings/draft", requireAdmin, async (req, res): Promise<void> => {
   }
 });
 
-router.put("/settings", requireAdmin, async (req, res): Promise<void> => {
+router.put("/settings", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = UpdateSettingsBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -145,7 +145,7 @@ router.put("/settings", requireAdmin, async (req, res): Promise<void> => {
   }
 });
 
-router.post("/settings/publish", requireAdmin, async (req, res): Promise<void> => {
+router.post("/settings/publish", requireAdminJwt, async (req, res): Promise<void> => {
   try {
     await ensureSettings();
     const [draft] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, true));

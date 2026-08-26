@@ -7,7 +7,7 @@ import {
   UpdateBookingStatusParams,
   UpdateBookingStatusBody,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -29,7 +29,7 @@ async function bookingWithRoom(b: typeof bookingsTable.$inferSelect) {
 }
 
 // GET /bookings
-router.get("/bookings", requireAdmin, async (req, res): Promise<void> => {
+router.get("/bookings", requireAdminJwt, async (req, res): Promise<void> => {
   try {
     const bookings = await db.select().from(bookingsTable).orderBy(desc(bookingsTable.createdAt));
     const result = await Promise.all(bookings.map(bookingWithRoom));
@@ -63,7 +63,7 @@ router.post("/bookings", async (req, res): Promise<void> => {
 });
 
 // PATCH /bookings/:id/status
-router.patch("/bookings/:id/status", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/bookings/:id/status", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateBookingStatusParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

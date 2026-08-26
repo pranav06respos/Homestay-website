@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { IRouter } from "express";
 import { eq, and } from "drizzle-orm";
+import { verifyToken } from "../lib/jwt";
 import { db, roomsTable, roomImagesTable, mediaTable } from "@workspace/db";
 import {
   CreateRoomBody,
@@ -16,7 +17,7 @@ import {
   RemoveRoomImageParams,
   SetRoomCoverImageParams,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -47,9 +48,17 @@ router.get("/rooms", async (req, res): Promise<void> => {
   try {
     const isAdmin = req.query.admin === "true";
     if (isAdmin) {
-      const session = req.session as { admin?: boolean };
-      if (!session.admin) {
-        res.status(401).json({ error: "Unauthorized" });
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+      const token = authHeader.slice('Bearer '.length).trim();
+      try {
+        const payload = verifyToken(token) as { admin?: boolean };
+        if (!payload.admin) throw new Error('Not admin');
+      } catch (err) {
+        res.status(401).json({ error: 'Unauthorized' });
         return;
       }
     }
@@ -72,7 +81,7 @@ router.get("/rooms", async (req, res): Promise<void> => {
 });
 
 // POST /rooms
-router.post("/rooms", requireAdmin, async (req, res): Promise<void> => {
+router.post("/rooms", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = CreateRoomBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -102,7 +111,7 @@ router.get("/rooms/:id", async (req, res): Promise<void> => {
 });
 
 // PUT /rooms/:id
-router.put("/rooms/:id", requireAdmin, async (req, res): Promise<void> => {
+router.put("/rooms/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateRoomParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -131,7 +140,7 @@ router.put("/rooms/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // DELETE /rooms/:id
-router.delete("/rooms/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/rooms/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = DeleteRoomParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -143,7 +152,7 @@ router.delete("/rooms/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PATCH /rooms/:id/toggle-available
-router.patch("/rooms/:id/toggle-available", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/rooms/:id/toggle-available", requireAdminJwt, async (req, res): Promise<void> => {
   const params = ToggleRoomAvailableParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -163,7 +172,7 @@ router.patch("/rooms/:id/toggle-available", requireAdmin, async (req, res): Prom
 });
 
 // PATCH /rooms/:id/toggle-visible
-router.patch("/rooms/:id/toggle-visible", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/rooms/:id/toggle-visible", requireAdminJwt, async (req, res): Promise<void> => {
   const params = ToggleRoomVisibleParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -211,7 +220,7 @@ router.get("/rooms/:id/images", async (req, res): Promise<void> => {
 });
 
 // POST /rooms/:id/images
-router.post("/rooms/:id/images", requireAdmin, async (req, res): Promise<void> => {
+router.post("/rooms/:id/images", requireAdminJwt, async (req, res): Promise<void> => {
   const params = AddRoomImageParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -241,7 +250,7 @@ router.post("/rooms/:id/images", requireAdmin, async (req, res): Promise<void> =
 });
 
 // DELETE /rooms/:id/images/:imageId
-router.delete("/rooms/:id/images/:imageId", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/rooms/:id/images/:imageId", requireAdminJwt, async (req, res): Promise<void> => {
   const params = RemoveRoomImageParams.safeParse({
     id: parseId(req.params.id),
     imageId: parseId(req.params.imageId),
@@ -257,7 +266,7 @@ router.delete("/rooms/:id/images/:imageId", requireAdmin, async (req, res): Prom
 });
 
 // PATCH /rooms/:id/images/:imageId/set-cover
-router.patch("/rooms/:id/images/:imageId/set-cover", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/rooms/:id/images/:imageId/set-cover", requireAdminJwt, async (req, res): Promise<void> => {
   const params = SetRoomCoverImageParams.safeParse({
     id: parseId(req.params.id),
     imageId: parseId(req.params.imageId),

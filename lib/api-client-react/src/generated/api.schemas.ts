@@ -24,6 +24,7 @@ export interface LoginInput {
 export interface AuthResult {
   authenticated: boolean;
   message?: string;
+  token?: string;
 }
 
 export interface Settings {

@@ -9,7 +9,7 @@ import {
   DeleteReviewParams,
   ToggleReviewVisibleParams,
 } from "@workspace/api-zod";
-import { requireAdmin } from "../middlewares/auth";
+import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
@@ -44,7 +44,7 @@ router.get("/reviews", async (req, res): Promise<void> => {
 });
 
 // POST /reviews
-router.post("/reviews", requireAdmin, async (req, res): Promise<void> => {
+router.post("/reviews", requireAdminJwt, async (req, res): Promise<void> => {
   const parsed = CreateReviewBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -60,7 +60,7 @@ router.post("/reviews", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PUT /reviews/:id
-router.put("/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
+router.put("/reviews/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = UpdateReviewParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -84,7 +84,7 @@ router.put("/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // DELETE /reviews/:id
-router.delete("/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/reviews/:id", requireAdminJwt, async (req, res): Promise<void> => {
   const params = DeleteReviewParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -95,7 +95,7 @@ router.delete("/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
 });
 
 // PATCH /reviews/:id/toggle-visible
-router.patch("/reviews/:id/toggle-visible", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/reviews/:id/toggle-visible", requireAdminJwt, async (req, res): Promise<void> => {
   const params = ToggleReviewVisibleParams.safeParse({ id: parseId(req.params.id) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
