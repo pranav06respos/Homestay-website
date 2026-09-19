@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
+import { useLocationProperty, navigate as wouterNavigate } from 'wouter/use-browser-location';
 
 import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -40,40 +41,29 @@ const queryClient = new QueryClient({
   },
 });
 
-const currentNormalizedPath = () => {
+const currentNormalizedPathname = () => {
   if (typeof window === 'undefined') return '/';
-  const path = window.location.pathname.replace(/\/+/g, '/') || '/';
-  return path + window.location.search;
+  return window.location.pathname.replace(/\/+/g, '/') || '/';
 };
 
-// Custom location hook that collapses duplicate slashes (e.g. //admin/login -> /admin/login)
-function useNormalizedLocation(): [string, (to: string, options?: { replace?: boolean }) => void] {
-  const [loc, setLoc] = useState(currentNormalizedPath);
+// Reactive location hook that normalizes duplicate slashes and triggers instant re-renders on pushState
+function useNormalizedLocation(): [string, (to: string | URL, options?: { replace?: boolean }) => void] {
+  const pathname = useLocationProperty(currentNormalizedPathname, () => '/');
 
   useEffect(() => {
-    // If the URL has consecutive slashes, clean it in browser history
-    if (window.location.pathname.includes('//')) {
+    if (typeof window !== 'undefined' && window.location.pathname.includes('//')) {
       const clean = window.location.pathname.replace(/\/+/g, '/') || '/';
       window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
-      setLoc(clean + window.location.search);
     }
+  }, [pathname]);
 
-    const onPop = () => setLoc(currentNormalizedPath());
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+  const cleanNavigate = useCallback((to: string | URL, options?: { replace?: boolean }) => {
+    const toStr = typeof to === 'string' ? to : to.pathname + to.search + to.hash;
+    const cleanTo = toStr.replace(/\/+/g, '/') || '/';
+    wouterNavigate(cleanTo, options);
   }, []);
 
-  const navigate = useCallback((to: string, options?: { replace?: boolean }) => {
-    const cleanTo = to.replace(/\/+/g, '/') || '/';
-    if (options?.replace) {
-      window.history.replaceState(null, '', cleanTo);
-    } else {
-      window.history.pushState(null, '', cleanTo);
-    }
-    setLoc(cleanTo);
-  }, []);
-
-  return [loc, navigate];
+  return [pathname, cleanNavigate];
 }
 
 function Router() {
