@@ -3,10 +3,11 @@ import { Link, useLocation } from 'wouter';
 import { useGetAdminMe, useAdminLogout } from '@workspace/api-client-react';
 import { 
   LayoutDashboard, BedDouble, Image as ImageIcon, ImagePlus, 
-  CalendarDays, Map, Star, Settings, LogOut, Menu, X
+  CalendarDays, Map, Star, Settings, LogOut, Menu, X, Sun, Moon, ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/hooks/useTheme';
 
 const navItems = [
   { href: '/admin', subHref: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -24,6 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { data: adminMe, isLoading, error } = useGetAdminMe();
   const logout = useAdminLogout();
   const { toast } = useToast();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -81,7 +83,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           );
         })}
       </nav>
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-4 border-t border-sidebar-border space-y-1.5">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          onClick={toggleTheme}
+          title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+        >
+          {isDark ? (
+            <Sun className="w-5 h-5 mr-3 text-amber-400" />
+          ) : (
+            <Moon className="w-5 h-5 mr-3 opacity-70" />
+          )}
+          <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+        </Button>
         <Button 
           variant="ghost" 
           className="w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -119,12 +134,66 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen">
-        <header className="md:hidden flex items-center p-4 bg-background border-b border-border sticky top-0 z-40">
-          <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 mr-2">
-            <Menu className="w-6 h-6" />
-          </button>
-          <span className="font-serif text-xl text-primary">Neel Kamal Homestay · KASAULI</span>
+        {/* Desktop Top Bar */}
+        <header className="hidden md:flex items-center justify-between px-8 py-3.5 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-40">
+          <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+            <span className="font-serif text-lg text-foreground font-medium">Host Dashboard</span>
+            <span className="opacity-40">·</span>
+            <span className="text-[11px] uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-0.5 rounded-full font-semibold">
+              Admin Portal
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <a 
+              href="/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-muted font-medium border border-transparent hover:border-border"
+            >
+              <span>View Website</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleTheme}
+              className="gap-2 text-xs font-medium border-border hover:bg-muted"
+              title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span>Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-muted-foreground" />
+                  <span>Dark Mode</span>
+                </>
+              )}
+            </Button>
+          </div>
         </header>
+
+        {/* Mobile Header */}
+        <header className="md:hidden flex items-center justify-between p-4 bg-background border-b border-border sticky top-0 z-40">
+          <div className="flex items-center">
+            <button onClick={() => setMobileOpen(true)} className="p-2 -ml-2 mr-2 text-foreground">
+              <Menu className="w-6 h-6" />
+            </button>
+            <span className="font-serif text-lg text-primary font-medium">Neel Kamal Homestay</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="rounded-full text-foreground hover:bg-muted"
+            aria-label="Toggle light or dark theme"
+          >
+            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+          </Button>
+        </header>
+
         <div className="flex-1 p-6 lg:p-8">
           {children}
         </div>

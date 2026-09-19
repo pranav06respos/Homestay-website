@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/authContext';
+import { useTheme } from '@/hooks/useTheme';
+import { Sun, Moon } from 'lucide-react';
 
 const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
@@ -19,6 +21,7 @@ export default function AdminLogin() {
   const { setToken } = useAuth();
   const [, setLocation] = useLocation();
   const login = useAdminLogin();
+  const { isDark, toggleTheme } = useTheme();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -48,7 +51,28 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 relative p-4">
+      <div className="absolute top-6 right-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleTheme}
+          className="gap-2 text-xs border-border bg-card hover:bg-muted"
+          title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+        >
+          {isDark ? (
+            <>
+              <Sun className="w-4 h-4 text-amber-400" />
+              <span>Light Mode</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-4 h-4 text-muted-foreground" />
+              <span>Dark Mode</span>
+            </>
+          )}
+        </Button>
+      </div>
       <div className="mb-8 text-center">
         <h1 className="font-serif text-4xl text-primary mb-2">Neel Kamal Homestay</h1>
         <p className="text-xs tracking-[0.3em] font-medium uppercase text-muted-foreground">KASAULI · Admin Portal</p>
