@@ -79,36 +79,50 @@ router.get("/media", requireAdminJwt, async (req, res): Promise<void> => {
   }
 });
 
-// POST /media/upload
-router.post("/media/upload", requireAdminJwt, upload.single("file"), async (req, res): Promise<void> => {
-  if (!req.file) {
+// POST /media/upload (supports both single file and multiple files)
+router.post("/media/upload", requireAdminJwt, upload.any(), async (req, res): Promise<void> => {
+  const files = (req.files as Express.Multer.File[]) || [];
+  if (!files.length) {
     res.status(400).json({ error: "No file uploaded" });
     return;
   }
 
-  // Keep media same-origin so proxied previews and deployments resolve correctly.
-  const url = `/api/uploads/${req.file.filename}`;
   const altText = req.body.altText as string | undefined;
+  const createdItems = [];
 
-  // Read file data into Base64 for persistent database storage in PostgreSQL
-  const fileBuffer = fs.readFileSync(req.file.path);
-  const base64Data = fileBuffer.toString("base64");
+  for (const file of files) {
+    const url = `/api/uploads/${file.filename}`;
+    const fileBuffer = fs.readFileSync(file.path);
+    const base64Data = fileBuffer.toString("base64");
 
-  const [media] = await db
-    .insert(mediaTable)
-    .values({
-      filename: req.file.filename,
-      originalName: req.file.originalname,
-      url,
-      mimeType: req.file.mimetype,
-      sizeBytes: req.file.size,
-      altText: altText ?? null,
-      data: base64Data,
-      usedIn: [],
-    })
-    .returning();
+    const [media] = await db
+      .insert(mediaTable)
+      .values({
+        filename: file.filename,
+        originalName: file.originalname,
+        url,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        altText: altText ?? null,
+        data: base64Data,
+        usedIn: [],
+      })
+      .returning();
 
-  res.status(201).json({ ...media, createdAt: media.createdAt.toISOString() });
+    createdItems.push({ ...media, createdAt: media.createdAt.toISOString() });
+  }
+
+  // If exactly one file was uploaded and not in an explicit batch request, return the single object for backward compatibility
+  if (files.length === 1 && req.headers['x-batch-upload'] !== 'true') {
+    res.status(201).json(createdItems[0]);
+    return;
+  }
+
+  res.status(201).json({
+    success: true,
+    count: createdItems.length,
+    items: createdItems,
+  });
 });
 
 // GET /media/:id
