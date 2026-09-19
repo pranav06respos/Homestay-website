@@ -16,10 +16,10 @@ export default function Dashboard() {
   }
 
   const statCards = [
-    { label: 'Total Rooms', value: stats?.totalRooms || 0, icon: BedDouble, href: '/rooms' },
-    { label: 'Pending Bookings', value: stats?.pendingBookings || 0, icon: Inbox, href: '/bookings' },
-    { label: 'Gallery Images', value: stats?.totalGalleryImages || 0, icon: ImageIcon, href: '/gallery' },
-    { label: 'Media Files', value: stats?.totalMediaFiles || 0, icon: ImageIcon, href: '/media' },
+    { label: 'Total Rooms', value: stats?.totalRooms || 0, icon: BedDouble, href: '/admin/rooms' },
+    { label: 'Pending Bookings', value: stats?.pendingBookings || 0, icon: Inbox, href: '/admin/bookings' },
+    { label: 'Gallery Images', value: stats?.totalGalleryImages || 0, icon: ImageIcon, href: '/admin/gallery' },
+    { label: 'Media Files', value: stats?.totalMediaFiles || 0, icon: ImageIcon, href: '/admin/media' },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function Dashboard() {
         <div className="bg-card rounded-sm border border-border overflow-hidden">
           <div className="p-6 border-b border-border flex justify-between items-center">
             <h2 className="font-serif text-xl text-primary">Recent Bookings</h2>
-            <Link href="/bookings" className="text-sm text-primary hover:underline">View All</Link>
+            <Link href="/admin/bookings" className="text-sm text-primary hover:underline">View All</Link>
           </div>
           <div className="divide-y divide-border">
             {stats?.recentBookings && stats.recentBookings.length > 0 ? (
@@ -80,19 +80,19 @@ export default function Dashboard() {
             <h2 className="font-serif text-xl text-primary">Quick Actions</h2>
           </div>
           <div className="p-6 grid grid-cols-2 gap-4">
-            <Link href="/rooms" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
+            <Link href="/admin/rooms" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
               <BedDouble className="w-8 h-8 text-primary" />
               <span className="text-sm font-medium">Manage Rooms</span>
             </Link>
-            <Link href="/settings" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
+            <Link href="/admin/settings" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
               <Settings className="w-8 h-8 text-primary" />
               <span className="text-sm font-medium">Update Settings</span>
             </Link>
-            <Link href="/gallery" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
+            <Link href="/admin/gallery" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
               <ImageIcon className="w-8 h-8 text-primary" />
               <span className="text-sm font-medium">Manage Gallery</span>
             </Link>
-            <Link href="/reviews" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
+            <Link href="/admin/reviews" className="flex flex-col items-center justify-center p-6 border border-border rounded-sm hover:bg-muted transition-colors gap-3">
               <Star className="w-8 h-8 text-primary" />
               <span className="text-sm font-medium">Manage Reviews</span>
             </Link>

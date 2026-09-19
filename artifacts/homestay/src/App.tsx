@@ -73,41 +73,65 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
 
       {/* Admin Routes with Layout */}
-      <Route path="/admin" nest>
-        <AdminLayout>
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="" component={Dashboard} />
-            <Route path="/rooms" component={AdminRooms} />
-            <Route path="/rooms/:id/images" component={RoomImages} />
-            <Route path="/gallery" component={AdminGallery} />
-            <Route path="/media" component={MediaLibrary} />
-            <Route path="/bookings" component={Bookings} />
-            <Route path="/attractions" component={AdminAttractions} />
-            <Route path="/reviews" component={Reviews} />
-            <Route path="/settings" component={Settings} />
-            <Route component={NotFound} />
-          </Switch>
-        </AdminLayout>
+      <Route path="/admin">
+        <AdminLayout><Dashboard /></AdminLayout>
+      </Route>
+      <Route path="/admin/rooms">
+        <AdminLayout><AdminRooms /></AdminLayout>
+      </Route>
+      <Route path="/admin/rooms/:id/images">
+        <AdminLayout><RoomImages /></AdminLayout>
+      </Route>
+      <Route path="/admin/gallery">
+        <AdminLayout><AdminGallery /></AdminLayout>
+      </Route>
+      <Route path="/admin/media">
+        <AdminLayout><MediaLibrary /></AdminLayout>
+      </Route>
+      <Route path="/admin/bookings">
+        <AdminLayout><Bookings /></AdminLayout>
+      </Route>
+      <Route path="/admin/attractions">
+        <AdminLayout><AdminAttractions /></AdminLayout>
+      </Route>
+      <Route path="/admin/reviews">
+        <AdminLayout><Reviews /></AdminLayout>
+      </Route>
+      <Route path="/admin/settings">
+        <AdminLayout><Settings /></AdminLayout>
       </Route>
 
       {/* Public Routes with Layout */}
-      <Route path="/*">
-        <PublicLayout>
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/rooms" component={Rooms} />
-            <Route path="/rooms/:slug" component={RoomDetail} />
-            <Route path="/gallery" component={Gallery} />
-            <Route path="/amenities" component={Amenities} />
-            <Route path="/attractions" component={Attractions} />
-            <Route path="/about" component={About} />
-            <Route path="/contact" component={Contact} />
-            <Route path="/book" component={Book} />
-            <Route component={NotFound} />
-          </Switch>
-        </PublicLayout>
+      <Route path="/">
+        <PublicLayout><Home /></PublicLayout>
       </Route>
+      <Route path="/rooms">
+        <PublicLayout><Rooms /></PublicLayout>
+      </Route>
+      <Route path="/rooms/:slug">
+        <PublicLayout><RoomDetail /></PublicLayout>
+      </Route>
+      <Route path="/gallery">
+        <PublicLayout><Gallery /></PublicLayout>
+      </Route>
+      <Route path="/amenities">
+        <PublicLayout><Amenities /></PublicLayout>
+      </Route>
+      <Route path="/attractions">
+        <PublicLayout><Attractions /></PublicLayout>
+      </Route>
+      <Route path="/about">
+        <PublicLayout><About /></PublicLayout>
+      </Route>
+      <Route path="/contact">
+        <PublicLayout><Contact /></PublicLayout>
+      </Route>
+      <Route path="/book">
+        <PublicLayout><Book /></PublicLayout>
+      </Route>
+
+      {/* 404 Catch-All Route */}
+      <Route component={NotFound} />
     </Switch>
   );
 }
