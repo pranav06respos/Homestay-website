@@ -1,5 +1,5 @@
 import React from 'react';
-import { useListRooms, useToggleRoomAvailable, useToggleRoomVisible, useDeleteRoom, useCreateRoom, useUpdateRoom, Room } from '@workspace/api-client-react';
+import { useListRooms, useToggleRoomAvailable, useToggleRoomVisible, useDeleteRoom, useCreateRoom, useUpdateRoom, Room, resolveMediaUrl } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Plus, Edit, Trash2, Eye, EyeOff, BedDouble, Check, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -100,7 +100,14 @@ export default function Rooms() {
                   <TableCell>
                     <div className="w-16 h-12 bg-muted rounded overflow-hidden flex items-center justify-center">
                       {room.coverImageUrl ? (
-                        <img src={room.coverImageUrl} alt={room.name} className="w-full h-full object-cover" />
+                        <img 
+                          src={resolveMediaUrl(room.coverImageUrl)} 
+                          alt={room.name} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80";
+                          }}
+                        />
                       ) : (
                         <ImageIcon className="w-4 h-4 text-muted-foreground/50" />
                       )}

@@ -2,6 +2,8 @@
 
 # compiled output
 dist
+!artifacts/homestay/dist
+!artifacts/homestay/dist/**
 tmp
 out-tsc
 *.tsbuildinfo

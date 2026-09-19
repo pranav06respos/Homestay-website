@@ -75,7 +75,11 @@ function isAllowedOrigin(origin: string): boolean {
     return (
       hostname === "localhost" ||
       hostname === "127.0.0.1" ||
-      hostname === "[::1]"
+      hostname === "[::1]" ||
+      hostname.endsWith(".pages.dev") ||
+      hostname.endsWith(".neelkamalhomestaykasauli.in") ||
+      hostname.endsWith(".neelkamalhomestay.com") ||
+      hostname === "neelkamalhomestay.com"
     );
   } catch {
     return false;
@@ -125,9 +129,19 @@ const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 app.use("/api/uploads", express.static(UPLOADS_DIR));
 
 // Retrieve uploaded files from local disk or reconstitute from PostgreSQL database store
-app.use("/api/uploads/:filename", async (req, res): Promise<void> => {
+app.get("/api/uploads/:filename", async (req, res): Promise<void> => {
+  const filename = req.params.filename;
+  const distinctPhotos = [
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+  ];
+
   try {
-    const filename = req.params.filename;
     const [media] = await db.select().from(mediaTable).where(eq(mediaTable.filename, filename));
 
     if (media && media.data) {
@@ -141,18 +155,7 @@ app.use("/api/uploads/:filename", async (req, res): Promise<void> => {
       return;
     }
 
-    // For legacy media records uploaded before base64 persistence where data is null,
-    // provide distinct deterministic photos per record ID so every image has a unique picture.
     if (media) {
-      const distinctPhotos = [
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-      ];
       const photoUrl = distinctPhotos[media.id % distinctPhotos.length];
       res.redirect(302, photoUrl);
       return;
@@ -161,7 +164,12 @@ app.use("/api/uploads/:filename", async (req, res): Promise<void> => {
     logger.error({ err }, "Failed to retrieve persistent media from database");
   }
 
-  res.status(404).send("File not found");
+  // Fallback gracefully to a deterministic photo based on filename hash so broken image icons never appear
+  let hash = 0;
+  for (let i = 0; i < filename.length; i++) {
+    hash = (hash + filename.charCodeAt(i)) % distinctPhotos.length;
+  }
+  res.redirect(302, distinctPhotos[hash]);
 });
 
 app.use("/api", router);

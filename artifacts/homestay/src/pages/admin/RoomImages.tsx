@@ -95,6 +95,9 @@ export default function RoomImages() {
                   src={resolveMediaUrl(image.url)} 
                   alt={image.altText || ''} 
                   className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80";
+                  }}
                 />
                 
                 {image.isCover && (
@@ -215,6 +218,9 @@ function RoomMediaPickerDialog({ roomId, open, onOpenChange, existingMediaIds }:
                       src={resolveMediaUrl(media.url)} 
                       alt="" 
                       className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
+                      }}
                     />
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center">

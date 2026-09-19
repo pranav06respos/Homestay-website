@@ -92,6 +92,9 @@ export default function RoomDetail() {
                   src={resolveMediaUrl(displayImages[currentImageIdx].url)} 
                   alt={room.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80";
+                  }}
                 />
                 {displayImages.length > 1 && (
                   <>

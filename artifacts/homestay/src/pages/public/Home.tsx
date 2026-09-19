@@ -70,11 +70,15 @@ const { data: reviews } = useListReviews();
         {settings?.heroVisible !== false && settings?.heroImageUrl ? (
           <picture className="absolute inset-0 z-0">
             <img
-              src={settings.heroImageUrl}
+              src={resolveMediaUrl(settings.heroImageUrl)}
               alt={settings?.heroHeading || 'Neel Kamal Homestay'}
               className="w-full h-full object-cover object-left md:object-center"
               loading="eager"
               decoding="async"
+              onError={(e) => {
+                // Fallback to high-quality Himalayan mountain homestay view if uploaded image is not reachable
+                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1920&q=80";
+              }}
             />
           </picture>
         ) : settings?.heroVisible !== false ? (
@@ -159,7 +163,14 @@ const { data: reviews } = useListReviews();
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/5] rounded-sm overflow-hidden bg-muted">
               {settings?.aboutImageUrl ? (
-              <img src={settings.aboutImageUrl} alt="About Neel Kamal Homestay" className="object-cover w-full h-full" />
+                <img
+                  src={resolveMediaUrl(settings.aboutImageUrl)}
+                  alt="About Neel Kamal Homestay"
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80";
+                  }}
+                />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <Wind className="w-24 h-24 opacity-20" />

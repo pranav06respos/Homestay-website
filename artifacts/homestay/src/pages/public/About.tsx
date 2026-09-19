@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGetSettings } from '@workspace/api-client-react';
+import { useGetSettings, resolveMediaUrl } from '@workspace/api-client-react';
 import { Clock, Ban, Info } from 'lucide-react';
 
 export default function About() {
@@ -16,7 +16,14 @@ export default function About() {
           </h1>
           {settings?.aboutImageUrl && (
             <div className="aspect-[21/9] bg-muted mb-12 rounded-sm overflow-hidden">
-              <img src={settings.aboutImageUrl} alt="Neel Kamal Homestay Property" className="w-full h-full object-cover" />
+              <img 
+                src={resolveMediaUrl(settings.aboutImageUrl)} 
+                alt="Neel Kamal Homestay Property" 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80";
+                }}
+              />
             </div>
           )}
           <div className="prose prose-stone max-w-3xl mx-auto text-lg leading-relaxed text-foreground/80 text-left md:text-center font-light">

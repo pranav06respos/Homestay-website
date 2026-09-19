@@ -52,6 +52,9 @@ export default function Rooms() {
                       src={resolveMediaUrl(room.coverImageUrl)} 
                       alt={room.name} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80";
+                      }}
                     />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50 bg-card">

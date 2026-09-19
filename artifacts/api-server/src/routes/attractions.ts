@@ -10,6 +10,7 @@ import {
   ToggleAttractionVisibleParams,
 } from "@workspace/api-zod";
 import { requireAdminJwt } from "../middlewares/jwtAuth";
+import { verifyToken } from "../lib/jwt";
 
 const router: IRouter = Router();
 

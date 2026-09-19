@@ -1,4 +1,6 @@
-﻿import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+
+const STORAGE_KEY = 'neel_kamal_admin_jwt';
 
 interface AuthContextType {
   token: string | null;
@@ -8,7 +10,22 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setTokenState] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(STORAGE_KEY);
+  });
+
+  const setToken = useCallback((t: string | null) => {
+    setTokenState(t);
+    if (typeof window !== 'undefined') {
+      if (t) {
+        localStorage.setItem(STORAGE_KEY, t);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  }, []);
+
   return (
     <AuthContext.Provider value={{ token, setToken }}>
       {children}
@@ -23,3 +40,4 @@ export const useAuth = () => {
   }
   return ctx;
 };
+

@@ -132,6 +132,9 @@ export default function MediaLibrary() {
                   alt={media.altText || media.filename} 
                   className={`w-full h-full object-cover cursor-pointer ${isSelected ? 'opacity-90 scale-95 rounded-sm' : ''}`}
                   onClick={() => toggleSelect(media.id)}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
+                  }}
                 />
                 
                 {/* Selection Checkmark */}
@@ -206,6 +209,9 @@ function MediaPreviewDialog({ media, open, onOpenChange, onDelete }: { media: Me
               src={resolveMediaUrl(media.url)} 
               alt={media.altText || ''} 
               className="max-w-full max-h-full object-contain drop-shadow-md" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80";
+              }}
             />
           </div>
           <div className="w-full md:w-1/3 p-6 flex flex-col bg-card">

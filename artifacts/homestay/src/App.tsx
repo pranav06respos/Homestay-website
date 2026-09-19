@@ -1,3 +1,4 @@
+import { useEffect, useState, useCallback } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -39,6 +40,41 @@ const queryClient = new QueryClient({
   },
 });
 
+const currentNormalizedPath = () => {
+  if (typeof window === 'undefined') return '/';
+  const path = window.location.pathname.replace(/\/+/g, '/') || '/';
+  return path + window.location.search;
+};
+
+// Custom location hook that collapses duplicate slashes (e.g. //admin/login -> /admin/login)
+function useNormalizedLocation(): [string, (to: string, options?: { replace?: boolean }) => void] {
+  const [loc, setLoc] = useState(currentNormalizedPath);
+
+  useEffect(() => {
+    // If the URL has consecutive slashes, clean it in browser history
+    if (window.location.pathname.includes('//')) {
+      const clean = window.location.pathname.replace(/\/+/g, '/') || '/';
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+      setLoc(clean + window.location.search);
+    }
+
+    const onPop = () => setLoc(currentNormalizedPath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const navigate = useCallback((to: string, options?: { replace?: boolean }) => {
+    const cleanTo = to.replace(/\/+/g, '/') || '/';
+    if (options?.replace) {
+      window.history.replaceState(null, '', cleanTo);
+    } else {
+      window.history.pushState(null, '', cleanTo);
+    }
+    setLoc(cleanTo);
+  }, []);
+
+  return [loc, navigate];
+}
 
 function Router() {
   return (
@@ -46,12 +82,12 @@ function Router() {
       {/* Admin Login Route (No Layout) */}
       <Route path="/admin/login" component={AdminLogin} />
 
-
       {/* Admin Routes with Layout */}
       <Route path="/admin" nest>
         <AdminLayout>
           <Switch>
             <Route path="/" component={Dashboard} />
+            <Route path="" component={Dashboard} />
             <Route path="/rooms" component={AdminRooms} />
             <Route path="/rooms/:id/images" component={RoomImages} />
             <Route path="/gallery" component={AdminGallery} />
@@ -90,7 +126,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+        <WouterRouter hook={useNormalizedLocation} base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <Router />
         </WouterRouter>
         <Toaster />

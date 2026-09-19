@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGetDraftSettings, useUpdateSettings, usePublishSettings, useListMedia, Media } from '@workspace/api-client-react';
+import { useGetDraftSettings, useUpdateSettings, usePublishSettings, useListMedia, Media, resolveMediaUrl } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -75,7 +75,14 @@ function MediaPickerDialog({
                     className={`relative aspect-square cursor-pointer border-2 rounded-sm overflow-hidden transition-all ${isSelected ? 'border-primary' : 'border-transparent hover:border-primary/50'}`}
                     onClick={() => setSelectedId(media.id)}
                   >
-                    <img src={media.url} alt="" className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} />
+                    <img 
+                      src={resolveMediaUrl(media.url)} 
+                      alt="" 
+                      className={`w-full h-full object-cover ${isSelected ? 'opacity-80' : ''}`} 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
+                      }}
+                    />
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
                         <Check className="w-4 h-4" />
@@ -125,7 +132,14 @@ function ImageField({
       <div className="flex items-start gap-4">
         <div className="w-40 h-28 rounded-sm overflow-hidden bg-muted border border-border flex items-center justify-center shrink-0">
           {currentUrl ? (
-            <img src={currentUrl} alt="" className="w-full h-full object-cover" />
+            <img 
+              src={resolveMediaUrl(currentUrl)} 
+              alt="" 
+              className="w-full h-full object-cover" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80";
+              }}
+            />
           ) : (
             <ImageIcon className="w-8 h-8 text-muted-foreground/30" />
           )}

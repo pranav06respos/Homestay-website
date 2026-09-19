@@ -47,6 +47,9 @@ export default function Gallery() {
                   alt={item.altText || 'Gallery Image'} 
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80";
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </button>
