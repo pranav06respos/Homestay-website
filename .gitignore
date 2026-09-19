@@ -74,3 +74,4 @@ artifacts/homestay/src/**/*.js.map
 
 # Local replit pnpm binary
 /pnpm
+push_to_github.py
