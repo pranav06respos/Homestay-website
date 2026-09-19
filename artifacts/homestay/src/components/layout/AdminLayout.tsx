@@ -10,14 +10,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/hooks/useTheme';
 
 const navItems = [
-  { href: '/admin', subHref: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/rooms', subHref: '/rooms', label: 'Rooms', icon: BedDouble },
-  { href: '/admin/gallery', subHref: '/gallery', label: 'Gallery', icon: ImageIcon },
-  { href: '/admin/media', subHref: '/media', label: 'Media Library', icon: ImagePlus },
-  { href: '/admin/bookings', subHref: '/bookings', label: 'Bookings', icon: CalendarDays },
-  { href: '/admin/attractions', subHref: '/attractions', label: 'Attractions', icon: Map },
-  { href: '/admin/reviews', subHref: '/reviews', label: 'Reviews', icon: Star },
-  { href: '/admin/settings', subHref: '/settings', label: 'Settings', icon: Settings },
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/rooms', label: 'Rooms', icon: BedDouble },
+  { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+  { href: '/media', label: 'Media Library', icon: ImagePlus },
+  { href: '/bookings', label: 'Bookings', icon: CalendarDays },
+  { href: '/attractions', label: 'Attractions', icon: Map },
+  { href: '/reviews', label: 'Reviews', icon: Star },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -53,19 +53,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border text-sidebar-foreground">
       <div className="p-6 border-b border-sidebar-border">
-        <Link href="/admin" className="inline-flex flex-col items-start">
+        <Link href="/" className="inline-flex flex-col items-start">
           <span className="font-serif text-2xl tracking-wide leading-none text-sidebar-primary">Neel Kamal Homestay</span>
           <span className="text-[10px] tracking-[0.2em] font-medium opacity-70 uppercase mt-1">KASAULI · Admin Panel</span>
         </Link>
       </div>
       <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-          const isActive = 
-            location === item.href || 
-            location === item.subHref || 
-            currentPath === item.href || 
-            (item.href !== '/admin' && currentPath.startsWith(item.href));
+          const isActive = item.href === '/'
+            ? (location === '/' || location === '')
+            : (location === item.href || location.startsWith(`${item.href}/`));
           return (
             <Link 
               key={item.href} 
