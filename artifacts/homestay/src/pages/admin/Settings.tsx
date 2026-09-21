@@ -1,5 +1,9 @@
 import React from 'react';
-import { useGetDraftSettings, useUpdateSettings, usePublishSettings, useListMedia, Media, resolveMediaUrl } from '@workspace/api-client-react';
+import { 
+  useGetDraftSettings, useUpdateSettings, usePublishSettings, 
+  useListMedia, useUploadMedia, resolveMediaUrl 
+} from '@workspace/api-client-react';
+import { compressImage } from '@/lib/imageCompression';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +12,11 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Image as ImageIcon, Check, Search } from 'lucide-react';
+import { Check, Image as ImageIcon, Search, Upload, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 
-// Inline media picker dialog for selecting a single image
+// Inline media picker dialog for selecting existing photos
 function MediaPickerDialog({
   open,
   onOpenChange,
@@ -45,7 +49,7 @@ function MediaPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">Choose Image</DialogTitle>
+          <DialogTitle className="font-serif text-2xl">Select Image</DialogTitle>
         </DialogHeader>
 
         <div className="relative mb-4">
@@ -63,7 +67,7 @@ function MediaPickerDialog({
             <div className="text-center py-12">Loading media...</div>
           ) : !mediaFiles?.length ? (
             <div className="text-center py-20 text-muted-foreground">
-              {search ? 'No matches found.' : 'No media uploaded yet. Upload images via the Media Library.'}
+              {search ? 'No matches found.' : 'No uploaded photos found.'}
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
@@ -112,7 +116,7 @@ function MediaPickerDialog({
   );
 }
 
-// Small inline image preview + picker trigger
+// Inline image preview with direct upload and optional picker
 function ImageField({
   label,
   currentUrl,
@@ -125,19 +129,42 @@ function ImageField({
   onSelect: (mediaId: number, url: string) => void;
 }) {
   const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const upload = useUploadMedia();
+  const { toast } = useToast();
+
+  const handleDirectFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const compressed = await compressImage(file);
+      const media: any = await upload.mutateAsync({ data: { file: compressed } });
+      if (media?.id && media?.url) {
+        onSelect(media.id, media.url);
+        toast({ title: "Image uploaded and selected!" });
+      }
+    } catch {
+      toast({ title: "Failed to upload image", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="space-y-3">
       <Label>{label}</Label>
-      <div className="flex items-start gap-4">
-        <div className="w-40 h-28 rounded-sm overflow-hidden bg-muted border border-border flex items-center justify-center shrink-0">
+      <div className="flex flex-col sm:flex-row items-start gap-4">
+        <div className="w-48 h-32 rounded-lg overflow-hidden bg-muted border border-border flex items-center justify-center shrink-0 shadow-xs">
           {currentUrl ? (
             <img 
               src={resolveMediaUrl(currentUrl)} 
               alt="" 
               className="w-full h-full object-cover" 
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80";
+                (e.currentTarget as HTMLImageElement).src = "/hero-cover.jpg";
               }}
             />
           ) : (
@@ -145,11 +172,36 @@ function ImageField({
           )}
         </div>
         <div className="flex flex-col gap-2 pt-1">
-          <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)} className="gap-2">
-            <ImageIcon className="w-4 h-4" />
-            {currentUrl ? 'Change Image' : 'Select Image'}
-          </Button>
-          <p className="text-xs text-muted-foreground">Pick from Media Library. Upload new images there first.</p>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleDirectFile} 
+            accept="image/*" 
+            className="hidden" 
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              type="button" 
+              variant="default" 
+              size="sm" 
+              onClick={() => fileInputRef.current?.click()} 
+              disabled={isUploading}
+              className="gap-2"
+            >
+              {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {isUploading ? "Uploading..." : "Upload New Photo"}
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setPickerOpen(true)} 
+              className="gap-2"
+            >
+              <ImageIcon className="w-4 h-4" /> Pick Existing
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">Upload directly from your phone/computer or pick an existing image.</p>
         </div>
       </div>
       <MediaPickerDialog
@@ -193,7 +245,6 @@ export default function Settings() {
     }
   });
 
-  // Tracked separately (not in react-hook-form) since they're picked via dialog
   const [heroImageMediaId, setHeroImageMediaId] = React.useState<number | null>(null);
   const [heroImageUrl, setHeroImageUrl] = React.useState<string | null>(null);
   const [aboutImageMediaId, setAboutImageMediaId] = React.useState<number | null>(null);
@@ -229,76 +280,71 @@ export default function Settings() {
     }
   }, [draftSettings, form]);
 
-  const onSaveDraft = async (data: any) => {
+  // Single-click straight away update & publish live — NO draft delay!
+  const onUpdateChanges = async (data: any) => {
     try {
       const payload: any = { ...data };
       if (heroImageMediaId !== null) payload.heroImageMediaId = heroImageMediaId;
       if (aboutImageMediaId !== null) payload.aboutImageMediaId = aboutImageMediaId;
+      if (heroImageUrl) payload.heroImageUrl = heroImageUrl;
+      if (aboutImageUrl) payload.aboutImageUrl = aboutImageUrl;
 
+      // 1. Save changes
       await updateSettings.mutateAsync({ data: payload });
+      // 2. Publish immediately to live site
+      await publishSettings.mutateAsync();
+
+      // 3. Invalidate React Queries
+      queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/settings/draft'] });
-      toast({ title: "Draft saved successfully" });
-    } catch {
-      toast({ title: "Failed to save draft", variant: "destructive" });
-    }
-  };
 
-  const onPublish = async () => {
-    if (confirm("Are you sure you want to publish these settings to the live website?")) {
+      // 4. Update local cache immediately so live site updates with zero delay
       try {
-        await publishSettings.mutateAsync();
-        queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/settings/draft'] });
-        toast({ title: "Settings published successfully!" });
-      } catch {
-        toast({ title: "Failed to publish", variant: "destructive" });
-      }
+        const current = localStorage.getItem('nkh_cached_settings');
+        const obj = current ? JSON.parse(current) : {};
+        localStorage.setItem('nkh_cached_settings', JSON.stringify({ ...obj, ...payload }));
+      } catch {}
+
+      toast({ title: "Changes updated and published live!" });
+    } catch {
+      toast({ title: "Failed to update changes", variant: "destructive" });
     }
   };
 
-  if (isLoading) return <div>Loading settings...</div>;
+  const isSaving = updateSettings.isPending || publishSettings.isPending;
+
+  if (isLoading) return <div className="p-8">Loading settings...</div>;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-card p-6 rounded-sm border border-border">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-card p-6 rounded-xl border border-border shadow-xs">
         <div>
           <h1 className="text-3xl font-serif text-primary">Website Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            {draftSettings?.isDraft 
-              ? <span className="text-amber-600 font-medium flex items-center gap-2">● Unsaved draft changes exist</span>
-              : <span className="text-green-600 flex items-center gap-2">● Draft is synced with live site</span>}
+          <p className="text-muted-foreground mt-1 text-sm">
+            Customize and publish your homestay information directly to the website.
           </p>
         </div>
-        <div className="flex gap-4">
-          <Button 
-            variant="outline" 
-            onClick={form.handleSubmit(onSaveDraft)}
-            disabled={updateSettings.isPending}
-            className="gap-2"
-          >
-            <Save className="w-4 h-4" /> Save Draft
-          </Button>
-          <Button 
-            onClick={onPublish}
-            disabled={publishSettings.isPending || !draftSettings?.isDraft}
-            className="gap-2 bg-green-600 hover:bg-green-700 text-white"
-          >
-            🚀 Publish Changes
-          </Button>
-        </div>
+        <Button 
+          onClick={form.handleSubmit(onUpdateChanges)}
+          disabled={isSaving}
+          className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-7 h-11 rounded-lg shadow-sm"
+        >
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+          {isSaving ? "Updating Changes..." : "Update Changes"}
+        </Button>
       </div>
 
-      <div className="bg-card rounded-sm border border-border">
+      <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent h-12 p-0 overflow-x-auto">
-            <TabsTrigger value="general" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6">General</TabsTrigger>
-            <TabsTrigger value="hero" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6">Hero Section</TabsTrigger>
-            <TabsTrigger value="about" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6">About Section</TabsTrigger>
-            <TabsTrigger value="contact" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6">Contact & Links</TabsTrigger>
-            <TabsTrigger value="policies" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6">Policies</TabsTrigger>
+            <TabsTrigger value="general" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6 font-medium">General</TabsTrigger>
+            <TabsTrigger value="hero" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6 font-medium">Hero Section</TabsTrigger>
+            <TabsTrigger value="about" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6 font-medium">About Section</TabsTrigger>
+            <TabsTrigger value="contact" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6 font-medium">Contact & Links</TabsTrigger>
+            <TabsTrigger value="policies" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-12 px-6 font-medium">Policies</TabsTrigger>
           </TabsList>
 
-          <form className="p-8">
+          <form onSubmit={form.handleSubmit(onUpdateChanges)} className="p-6 sm:p-8">
             <TabsContent value="general" className="space-y-6 m-0">
               <h2 className="text-xl font-serif text-primary mb-6">Global Identity</h2>
               <div className="grid gap-6 max-w-2xl">
@@ -323,8 +369,8 @@ export default function Settings() {
             </TabsContent>
 
             <TabsContent value="hero" className="space-y-6 m-0">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-serif text-primary">Homepage Hero</h2>
+              <div className="flex justify-between items-center max-w-2xl">
+                <h2 className="text-xl font-serif text-primary">Hero Banner Settings</h2>
                 <div className="flex items-center gap-2">
                   <Switch 
                     checked={form.watch('heroVisible')} 
@@ -432,6 +478,17 @@ export default function Settings() {
                 </div>
               </div>
             </TabsContent>
+
+            <div className="mt-8 pt-6 border-t border-border flex justify-end">
+              <Button 
+                type="submit"
+                disabled={isSaving}
+                className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 h-11 rounded-lg shadow-sm"
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {isSaving ? "Updating Changes..." : "Update Changes"}
+              </Button>
+            </div>
           </form>
         </Tabs>
       </div>

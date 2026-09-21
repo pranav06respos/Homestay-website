@@ -107,6 +107,26 @@ router.post("/rooms", requireAdminJwt, async (req, res): Promise<void> => {
   res.status(201).json(await roomWithCover(room));
 });
 
+// POST /rooms/reorder (must be declared before /rooms/:id)
+router.post("/rooms/reorder", requireAdminJwt, async (req, res): Promise<void> => {
+  try {
+    const items = req.body?.items;
+    if (!Array.isArray(items)) {
+      res.status(400).json({ error: "items array is required" });
+      return;
+    }
+    await Promise.all(
+      items.map((item: { id: number; sortOrder: number }) =>
+        db.update(roomsTable).set({ sortOrder: item.sortOrder }).where(eq(roomsTable.id, item.id))
+      )
+    );
+    res.json({ message: "Rooms reordered successfully" });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: "Failed to reorder rooms", details: message });
+  }
+});
+
 // GET /rooms/:id
 router.get("/rooms/:id", async (req, res): Promise<void> => {
   const params = GetRoomParams.safeParse({ id: parseId(req.params.id) });
