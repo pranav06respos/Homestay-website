@@ -1,2 +1,2 @@
-/api/* https://homestay-website-1.onrender.com/api/:splat 302
+/api/* https://homestay-website-1.onrender.com/api/:splat 307
 /* /index.html 200

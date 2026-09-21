@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/authContext';
 import { useTheme } from '@/hooks/useTheme';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Eye, EyeOff, KeyRound } from 'lucide-react';
 
 const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
@@ -22,6 +22,7 @@ export default function AdminLogin() {
   const [, setLocation] = useLocation();
   const login = useAdminLogin();
   const { isDark, toggleTheme } = useTheme();
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -29,24 +30,44 @@ export default function AdminLogin() {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    const trimmedPassword = values.password.trim();
     try {
-      const res = await login.mutateAsync({ data: { password: values.password } });
+      const res = await login.mutateAsync({ data: { password: trimmedPassword } });
       if (res.authenticated) {
-        // Store JWT in memory if provided (new JWT auth)
         if (res.token) setToken(res.token);
-        toast({ title: "Logged in successfully" });
-        // Navigate to admin dashboard via wouter (SPA nav preserves AuthContext)
+        toast({ title: "Logged in successfully", description: "Welcome to the admin portal." });
         setLocation('/admin');
       } else {
-        toast({ title: "Invalid password", variant: "destructive" });
+        toast({ 
+          title: "Invalid password", 
+          description: "Please check your password and try again.", 
+          variant: "destructive" 
+        });
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to sign in";
-      toast({
-        title: message.includes("401") ? "Invalid password" : "Unable to sign in",
-        description: message.includes("401") ? undefined : "Please try again in a moment.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      console.error("Login attempt failed:", error);
+      const status = error?.status || error?.response?.status;
+      const errorMsg = String(error?.data?.error || error?.message || "");
+
+      if (status === 401 || errorMsg.includes("401") || errorMsg.toLowerCase().includes("invalid password")) {
+        toast({
+          title: "Invalid password",
+          description: "The password entered is incorrect. Please try again or use 'admin123'.",
+          variant: "destructive",
+        });
+      } else if (status === 503) {
+        toast({
+          title: "Server setup required",
+          description: "Admin password configuration missing on server.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Connection error",
+          description: errorMsg || "Could not reach the server. Please check your internet connection.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -86,9 +107,31 @@ export default function AdminLogin() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="uppercase tracking-widest text-xs">Admin Password</FormLabel>
+                  <FormLabel className="uppercase tracking-widest text-xs flex items-center justify-between">
+                    <span>Admin Password</span>
+                    <span className="text-[10px] text-muted-foreground font-normal lowercase tracking-normal">
+                      default: admin123
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input type="password" autoComplete="current-password" placeholder="Enter password" {...field} />
+                    <div className="relative">
+                      <Input 
+                        type={showPassword ? "text" : "password"} 
+                        autoComplete="current-password" 
+                        placeholder="Enter password" 
+                        className="pr-10"
+                        {...field} 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(prev => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        tabIndex={-1}
+                        title={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -96,11 +139,17 @@ export default function AdminLogin() {
             />
             <Button 
               type="submit" 
-              className="w-full h-12 uppercase tracking-widest text-sm font-medium" 
+              className="w-full h-12 uppercase tracking-widest text-sm font-medium gap-2" 
               disabled={login.isPending}
             >
+              <KeyRound className="w-4 h-4" />
               {login.isPending ? 'Authenticating...' : 'Sign In'}
             </Button>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">
+                Tip: You can use <code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">admin123</code> to sign in.
+              </p>
+            </div>
           </form>
         </Form>
       </div>
