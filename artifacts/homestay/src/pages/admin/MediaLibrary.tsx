@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { compressImage } from '@/lib/imageCompression';
+
 interface UploadItem {
   id: string;
   file: File;
@@ -123,8 +125,8 @@ export default function MediaLibrary() {
     setIsUploadingBatch(true);
 
     const runUploads = async () => {
-      // Process in concurrent batches of 2 files
-      const CONCURRENCY = 2;
+      // Process in concurrent batches of 3 files
+      const CONCURRENCY = 3;
       const queueCopy = [...pendingItems];
 
       while (queueCopy.length > 0 && isMounted) {
@@ -137,7 +139,9 @@ export default function MediaLibrary() {
             );
 
             try {
-              await upload.mutateAsync({ data: { file: item.file } });
+              // Rapidly optimize and compress image before uploading for near-instant transfer
+              const fileToUpload = await compressImage(item.file);
+              await upload.mutateAsync({ data: { file: fileToUpload } });
               if (!isMounted) return;
 
               setUploadQueue(prev =>

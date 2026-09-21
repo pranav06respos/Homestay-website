@@ -218,9 +218,11 @@ function RoomDialog({ room, open, onOpenChange }: { room: Room | null, open: boo
   };
 
   const onSubmit = async (data: any) => {
+    const rawSlug = data.slug?.trim() || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = rawSlug || `room-${Date.now()}`;
     const payload = {
       name: data.name,
-      slug: data.slug,
+      slug,
       description: data.description,
       shortDescription: data.shortDescription,
       pricePerNight: data.pricePerNight ? parseInt(data.pricePerNight) : null,

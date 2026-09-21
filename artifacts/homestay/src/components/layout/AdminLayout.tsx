@@ -3,11 +3,12 @@ import { Link, useLocation } from 'wouter';
 import { useGetAdminMe, useAdminLogout } from '@workspace/api-client-react';
 import { 
   LayoutDashboard, BedDouble, Image as ImageIcon, ImagePlus, 
-  CalendarDays, Map, Star, Settings, LogOut, Menu, X, Sun, Moon, ExternalLink
+  CalendarDays, Map, Star, Settings, LogOut, Menu, X, Sun, Moon, ExternalLink, Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/hooks/useTheme';
+import { AdminGuideModal, AdminSectionKey } from '@/components/admin/AdminGuideModal';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,6 +28,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { toast } = useToast();
   const { isDark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [guideOpen, setGuideOpen] = React.useState(false);
+
+  const getCurrentSection = (): AdminSectionKey => {
+    if (location.includes('/rooms/') && location.includes('/images')) return 'room-images';
+    if (location.startsWith('/admin/rooms')) return 'rooms';
+    if (location.startsWith('/admin/media')) return 'media';
+    if (location.startsWith('/admin/gallery')) return 'gallery';
+    if (location.startsWith('/admin/bookings')) return 'bookings';
+    if (location.startsWith('/admin/attractions')) return 'attractions';
+    if (location.startsWith('/admin/reviews')) return 'reviews';
+    if (location.startsWith('/admin/settings')) return 'settings';
+    return 'dashboard';
+  };
 
   React.useEffect(() => {
     if (!isLoading && (!adminMe?.authenticated || error)) {
@@ -81,6 +95,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         })}
       </nav>
       <div className="p-4 border-t border-sidebar-border space-y-1.5">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-xs"
+          onClick={() => { setMobileOpen(false); setGuideOpen(true); }}
+          title="Open helpful guide for this section"
+        >
+          <Lightbulb className="w-4 h-4 mr-3 text-amber-400" />
+          <span>How this works</span>
+        </Button>
         <Button 
           variant="ghost" 
           className="w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -141,6 +164,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setGuideOpen(true)}
+              className="gap-2 text-xs font-medium border-amber-500/30 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10 bg-amber-500/5 shadow-xs"
+              title="Open step-by-step guide for this section"
+            >
+              <Lightbulb className="w-4 h-4 text-amber-500" />
+              <span>How this works</span>
+            </Button>
             <a 
               href="/" 
               target="_blank" 
@@ -180,21 +213,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             <span className="font-serif text-lg text-primary font-medium">Neel Kamal Homestay</span>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-full text-foreground hover:bg-muted"
-            aria-label="Toggle light or dark theme"
-          >
-            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setGuideOpen(true)}
+              className="gap-1.5 text-xs px-2.5 h-8 border-amber-500/30 text-amber-900 dark:text-amber-200 bg-amber-500/5"
+            >
+              <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+              <span>Guide</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-foreground"
+              onClick={toggleTheme}
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+            </Button>
+          </div>
         </header>
 
-        <div className="flex-1 p-6 lg:p-8">
+        {/* Page Content */}
+        <div className="p-4 sm:p-6 lg:p-8 flex-1 max-w-7xl w-full mx-auto">
           {children}
         </div>
       </main>
+
+      {/* Contextual Walkthrough Guide Dialog */}
+      <AdminGuideModal 
+        open={guideOpen} 
+        onOpenChange={setGuideOpen} 
+        initialSection={getCurrentSection()} 
+      />
     </div>
   );
 }

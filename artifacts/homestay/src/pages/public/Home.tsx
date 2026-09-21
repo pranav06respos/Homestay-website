@@ -233,7 +233,7 @@ const { data: reviews } = useListReviews();
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {visibleRooms.slice(0, 3).map((room) => (
-              <Link key={room.id} href={`/rooms/${room.slug}`} className="group block relative rounded-sm overflow-hidden bg-card border border-border transition-shadow hover:shadow-md">
+              <Link key={room.id} href={`/rooms/${room.slug || room.id}`} className="group block relative rounded-sm overflow-hidden bg-card border border-border transition-shadow hover:shadow-md">
                 <div className="aspect-[4/3] bg-muted relative overflow-hidden">
                   {room.coverImageUrl ? (
                     <img src={resolveMediaUrl(room.coverImageUrl)} alt={room.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />

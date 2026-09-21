@@ -115,7 +115,7 @@ export default function Rooms() {
                   
                   <div className="flex gap-4 mt-auto">
                     <Link 
-                      href={`/rooms/${room.slug}`}
+                      href={`/rooms/${room.slug || room.id}`}
                       className="px-6 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-wider font-medium hover:bg-primary/90 transition-colors rounded-sm text-center flex-1"
                     >
                       View Details

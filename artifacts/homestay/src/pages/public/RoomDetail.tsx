@@ -7,12 +7,20 @@ import { Link } from 'wouter';
 export default function RoomDetail() {
   const { slug } = useParams();
   const { data: rooms, isLoading: isLoadingRooms } = useListRooms();
-  const room = rooms?.find(r => r.slug === slug);
+  const room = rooms?.find(r => (slug && r.slug === slug) || String(r.id) === slug);
   const { data: images } = useListRoomImages(room?.id || 0, {
-    query: { enabled: !!room?.id, queryKey: ['/api/rooms', room?.id || 0, 'images'] },
+    query: { 
+      enabled: !!room?.id, 
+      queryKey: [`/api/rooms/${room?.id}/images`] 
+    },
   });
 
   const [currentImageIdx, setCurrentImageIdx] = React.useState(0);
+
+  // Reset image carousel index whenever the active room changes
+  React.useEffect(() => {
+    setCurrentImageIdx(0);
+  }, [room?.id]);
 
   if (isLoadingRooms) {
     return (
@@ -41,7 +49,11 @@ export default function RoomDetail() {
   }
 
   const sortedImages = [...(images || [])].sort((a, b) => a.sortOrder - b.sortOrder);
-  const displayImages = sortedImages.length > 0 ? sortedImages : (room.coverImageUrl ? [{ url: room.coverImageUrl, id: 0 }] : []);
+  // Strictly ensure only photos belonging to this specific room are displayed
+  const roomSpecificImages = sortedImages.filter(img => !img.roomId || img.roomId === room.id);
+  const displayImages = roomSpecificImages.length > 0 
+    ? roomSpecificImages 
+    : (room.coverImageUrl ? [{ url: room.coverImageUrl, id: 0, roomId: room.id }] : []);
 
   const nextImage = () => setCurrentImageIdx((prev) => (prev + 1) % displayImages.length);
   const prevImage = () => setCurrentImageIdx((prev) => (prev - 1 + displayImages.length) % displayImages.length);

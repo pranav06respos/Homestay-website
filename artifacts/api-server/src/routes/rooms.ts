@@ -26,6 +26,17 @@ function parseId(raw: string | string[]): number {
   return parseInt(s, 10);
 }
 
+function normalizeMediaUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname.startsWith("/api/uploads/")) return parsed.pathname;
+  } catch {
+    // Keep existing relative or legacy values unchanged
+  }
+  return url;
+}
+
 async function roomWithCover(room: typeof roomsTable.$inferSelect) {
   const [cover] = await db
     .select({ url: mediaTable.url })
@@ -35,8 +46,9 @@ async function roomWithCover(room: typeof roomsTable.$inferSelect) {
 
   return {
     ...room,
+    slug: room.slug?.trim() || `room-${room.id}`,
     pricePerNight: room.pricePerNight ? parseFloat(String(room.pricePerNight)) : null,
-    coverImageUrl: cover?.url?.startsWith("http") ? new URL(cover.url).pathname : (cover?.url ?? null),
+    coverImageUrl: normalizeMediaUrl(cover?.url),
     // Safely convert — Supabase may return string or Date object
     createdAt: room.createdAt ? new Date(room.createdAt).toISOString() : null,
     updatedAt: room.updatedAt ? new Date(room.updatedAt).toISOString() : null,
@@ -215,7 +227,7 @@ router.get("/rooms/:id/images", async (req, res): Promise<void> => {
     .orderBy(roomImagesTable.sortOrder);
   res.json(images.map((image) => ({
     ...image,
-    url: image.url.startsWith("http") ? new URL(image.url).pathname : image.url,
+    url: normalizeMediaUrl(image.url) ?? image.url,
   })));
 });
 
