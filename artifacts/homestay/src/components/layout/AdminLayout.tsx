@@ -14,7 +14,6 @@ const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/rooms', label: 'Rooms', icon: BedDouble },
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon },
-  { href: '/admin/media', label: 'Media Library', icon: ImagePlus },
   { href: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
   { href: '/admin/attractions', label: 'Attractions', icon: Map },
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
@@ -33,7 +32,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const getCurrentSection = (): AdminSectionKey => {
     if (location.includes('/rooms/') && location.includes('/images')) return 'room-images';
     if (location.startsWith('/admin/rooms')) return 'rooms';
-    if (location.startsWith('/admin/media')) return 'media';
     if (location.startsWith('/admin/gallery')) return 'gallery';
     if (location.startsWith('/admin/bookings')) return 'bookings';
     if (location.startsWith('/admin/attractions')) return 'attractions';

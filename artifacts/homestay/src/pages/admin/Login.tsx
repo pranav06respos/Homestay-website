@@ -52,7 +52,7 @@ export default function AdminLogin() {
       if (status === 401 || errorMsg.includes("401") || errorMsg.toLowerCase().includes("invalid password")) {
         toast({
           title: "Invalid password",
-          description: "The password entered is incorrect. Please try again or use 'admin123'.",
+          description: "The password entered is incorrect. Please try again.",
           variant: "destructive",
         });
       } else if (status === 503) {
@@ -107,11 +107,8 @@ export default function AdminLogin() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="uppercase tracking-widest text-xs flex items-center justify-between">
-                    <span>Admin Password</span>
-                    <span className="text-[10px] text-muted-foreground font-normal lowercase tracking-normal">
-                      default: admin123
-                    </span>
+                  <FormLabel className="uppercase tracking-widest text-xs">
+                    Admin Password
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
@@ -145,11 +142,6 @@ export default function AdminLogin() {
               <KeyRound className="w-4 h-4" />
               {login.isPending ? 'Authenticating...' : 'Sign In'}
             </Button>
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground">
-                Tip: You can use <code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">admin123</code> to sign in.
-              </p>
-            </div>
           </form>
         </Form>
       </div>

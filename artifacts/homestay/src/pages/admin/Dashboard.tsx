@@ -19,7 +19,6 @@ export default function Dashboard() {
     { label: 'Total Rooms', value: stats?.totalRooms || 0, icon: BedDouble, href: '/admin/rooms' },
     { label: 'Pending Bookings', value: stats?.pendingBookings || 0, icon: Inbox, href: '/admin/bookings' },
     { label: 'Gallery Images', value: stats?.totalGalleryImages || 0, icon: ImageIcon, href: '/admin/gallery' },
-    { label: 'Media Files', value: stats?.totalMediaFiles || 0, icon: ImageIcon, href: '/admin/media' },
   ];
 
   return (
@@ -29,7 +28,7 @@ export default function Dashboard() {
         <p className="text-muted-foreground mt-2">Overview of Neel Kamal Homestay</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {statCards.map((stat, i) => (
           <Link key={i} href={stat.href} className="bg-card p-6 rounded-sm border border-border shadow-sm hover:shadow-md transition-shadow group flex items-center gap-4">
             <div className="p-3 bg-primary/10 text-primary rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">

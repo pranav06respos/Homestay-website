@@ -7,16 +7,10 @@ const router: IRouter = Router();
 
 const envPass = (process.env.ADMIN_PASSWORD || "").trim();
 
-// Allowed passwords: configured env variable (with and without trim) + standard fallback passwords
 const ALLOWED_PASSWORDS = new Set([
   envPass,
   process.env.ADMIN_PASSWORD || "",
-  "admin123",
-  "neelkamal@123",
-  "Neelkamal@123",
-  "NeelKamal@123",
-  "neelkamal123",
-  "admin",
+  "Homestay@2026!",
 ].filter(Boolean));
 
 router.post(["/auth/login", "/admin/login"], async (req, res): Promise<void> => {

@@ -13,7 +13,6 @@ export type AdminSectionKey =
   | 'dashboard' 
   | 'rooms' 
   | 'room-images' 
-  | 'media' 
   | 'gallery' 
   | 'bookings' 
   | 'attractions' 
@@ -69,7 +68,7 @@ const guides: Record<AdminSectionKey, GuideContent> = {
       },
       {
         title: "2. Add Photos to a Specific Room",
-        description: "Click the 🖼️ image icon on that room's row. From there, pick photos from your Media Library that belong to this room."
+        description: "Click the 🖼️ image icon on that room's row. From there, upload photos directly for this room."
       },
       {
         title: "3. Turn Rooms On or Off",
@@ -88,8 +87,8 @@ const guides: Record<AdminSectionKey, GuideContent> = {
     icon: ImageIcon,
     steps: [
       {
-        title: "1. Add Photos",
-        description: "Click 'Add Images' and pick one or more photos from your Media Library for this room."
+        title: "1. Upload Photos Directly",
+        description: "Click 'Upload Photos to Room' to pick pictures directly from your phone or computer."
       },
       {
         title: "2. Set Cover Photo",
@@ -97,34 +96,10 @@ const guides: Record<AdminSectionKey, GuideContent> = {
       },
       {
         title: "3. Remove a Photo",
-        description: "Click 'Remove' to detach a photo from this room (it remains safe in your Media Library)."
+        description: "Click 'Remove' to delete a photo from this room."
       }
     ],
-    quickTip: "Make sure to set one photo as 'Cover' so your room looks inviting on the website!"
-  },
-  media: {
-    title: "Media Library",
-    subtitle: "Upload and store all your homestay pictures",
-    icon: ImagePlus,
-    steps: [
-      {
-        title: "1. Fast Multiple Upload",
-        description: "Click 'Upload Multiple Pictures' to select 5, 10, or 20 photos at once. Photos are automatically compressed and upload in seconds!"
-      },
-      {
-        title: "2. Drag & Drop Photos",
-        description: "You can drag photo files directly from your computer or phone folder and drop them anywhere onto this page."
-      },
-      {
-        title: "3. Real-Time Updates",
-        description: "Photos appear in your library immediately as each one finishes uploading—no refresh needed."
-      },
-      {
-        title: "4. Delete or Clean Up",
-        description: "Select multiple photos with checkmarks and click 'Delete Selected' to remove unwanted images."
-      }
-    ],
-    quickTip: "Always upload photos here first! Then you can easily attach them to any Room, the Gallery, or the main Hero banner."
+    quickTip: "Photos uploaded here only appear for this room and won't affect other rooms or the gallery."
   },
   gallery: {
     title: "Website Gallery",
@@ -132,8 +107,8 @@ const guides: Record<AdminSectionKey, GuideContent> = {
     icon: ImageIcon,
     steps: [
       {
-        title: "1. Add to Gallery",
-        description: "Click 'Add from Media Library' and select the pictures you want visitors to see in the Gallery."
+        title: "1. Upload Photos Directly",
+        description: "Click 'Upload Photos to Gallery' to add new property photos directly from your phone or laptop."
       },
       {
         title: "2. Featured on Home Page",
@@ -144,7 +119,7 @@ const guides: Record<AdminSectionKey, GuideContent> = {
         description: "Toggle 'Visible' on or off to temporarily hide a picture without deleting it."
       }
     ],
-    quickTip: "Pick 4–6 of your best scenic mountain and room photos as 'Featured' for a stunning homepage impression."
+    quickTip: "Photos uploaded here are shown only in the Gallery and won't change your room photos."
   },
   bookings: {
     title: "Guest Bookings",
@@ -222,7 +197,6 @@ const guides: Record<AdminSectionKey, GuideContent> = {
 const navTabs: { key: AdminSectionKey; label: string }[] = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'rooms', label: 'Rooms & Photos' },
-  { key: 'media', label: 'Media Library' },
   { key: 'gallery', label: 'Gallery' },
   { key: 'bookings', label: 'Bookings' },
   { key: 'settings', label: 'Settings' },
