@@ -3,6 +3,7 @@ import { useGetSettings, useListRooms, useListReviews, resolveMediaUrl } from '@
 import { Link } from 'wouter';
 import { MapPin, Wifi, Car, Coffee, Wind, Star, Church, Mountain, Trees, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 const CACHE_SETTINGS_KEY = 'nkh_cached_settings';
 const CACHE_ROOMS_KEY = 'nkh_cached_rooms';
@@ -152,16 +153,14 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[88vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden">
         <picture className="absolute inset-0 z-0">
-          <img
+          <OptimizedImage
             src={heroImageSrc}
             alt={activeSettings?.heroHeading || 'Neel Kamal Homestay'}
             className="w-full h-full object-cover object-left md:object-center"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/hero-cover.jpg";
-            }}
+            priority={true}
+            width={1400}
+            quality={82}
+            fallbackSrc="/hero-cover.jpg"
           />
         </picture>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/35 via-black/45 to-black/60" />
@@ -246,14 +245,12 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted shadow-sm">
-              <img
-                src={activeSettings?.aboutImageUrl ? resolveMediaUrl(activeSettings.aboutImageUrl) : '/hero-cover.jpg'}
+              <OptimizedImage
+                src={activeSettings?.aboutImageUrl}
                 alt="About Neel Kamal Homestay"
                 className="object-cover w-full h-full"
-                loading="lazy"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/hero-cover.jpg";
-                }}
+                width={800}
+                fallbackSrc="/hero-cover.jpg"
               />
             </div>
             <div>
@@ -316,14 +313,13 @@ export default function Home() {
             {visibleRooms.slice(0, 3).map((room) => (
               <Link key={room.id} href={`/rooms/${room.slug || room.id}`} className="group block relative rounded-xl overflow-hidden bg-card border border-border/80 transition-all hover:shadow-md hover:-translate-y-1">
                 <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-                  <img 
-                    src={room.coverImageUrl ? resolveMediaUrl(room.coverImageUrl) : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'} 
+                  <OptimizedImage 
+                    src={room.coverImageUrl} 
                     alt={room.name} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80";
-                    }}
+                    width={600}
+                    quality={80}
+                    fallbackSrc="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"
                   />
                   {!room.isAvailable && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-10">

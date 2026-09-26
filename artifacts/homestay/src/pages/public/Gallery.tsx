@@ -2,6 +2,7 @@ import React from 'react';
 import { useListGallery, resolveMediaUrl } from '@workspace/api-client-react';
 import { Wind, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function Gallery() {
   const { data: galleryItems, isLoading } = useListGallery();
@@ -42,14 +43,13 @@ export default function Gallery() {
                 onClick={() => setSelectedImage(resolveMediaUrl(item.url))}
                 aria-label={`Open ${item.altText || 'gallery image'}`}
               >
-                <img 
-                  src={resolveMediaUrl(item.url)} 
+                <OptimizedImage 
+                  src={item.url} 
                   alt={item.altText || 'Gallery Image'} 
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80";
-                  }}
+                  width={600}
+                  quality={80}
+                  fallbackSrc="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </button>

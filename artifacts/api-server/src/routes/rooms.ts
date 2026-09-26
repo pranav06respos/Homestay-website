@@ -21,6 +21,15 @@ import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
+let cachedPublicRooms: any = null;
+let lastRoomsFetch = 0;
+const ROOMS_CACHE_TTL = 60 * 1000; // 60 seconds
+
+export function invalidateRoomsCache() {
+  cachedPublicRooms = null;
+  lastRoomsFetch = 0;
+}
+
 function parseId(raw: string | string[]): number {
   const s = Array.isArray(raw) ? raw[0] : raw;
   return parseInt(s, 10);
@@ -74,6 +83,15 @@ router.get("/rooms", async (req, res): Promise<void> => {
         return;
       }
     }
+    if (!isAdmin) {
+      const now = Date.now();
+      if (cachedPublicRooms && now - lastRoomsFetch < ROOMS_CACHE_TTL) {
+        res.setHeader("X-Cache", "HIT");
+        res.json(cachedPublicRooms);
+        return;
+      }
+    }
+
     let rooms;
     if (isAdmin) {
       rooms = await db.select().from(roomsTable).orderBy(roomsTable.sortOrder);
@@ -85,6 +103,11 @@ router.get("/rooms", async (req, res): Promise<void> => {
         .orderBy(roomsTable.sortOrder);
     }
     const result = await Promise.all(rooms.map(roomWithCover));
+    if (!isAdmin) {
+      cachedPublicRooms = result;
+      lastRoomsFetch = Date.now();
+      res.setHeader("X-Cache", "MISS");
+    }
     res.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -104,6 +127,7 @@ router.post("/rooms", requireAdminJwt, async (req, res): Promise<void> => {
     .insert(roomsTable)
     .values({ ...rest, pricePerNight: pricePerNight != null ? String(pricePerNight) : null })
     .returning();
+  invalidateRoomsCache();
   res.status(201).json(await roomWithCover(room));
 });
 
@@ -327,6 +351,7 @@ router.patch("/rooms/:id/images/:imageId/set-cover", requireAdminJwt, async (req
   }
 
   const [media] = await db.select().from(mediaTable).where(eq(mediaTable.id, img.mediaId));
+  invalidateRoomsCache();
   res.json({ ...img, url: media?.url ?? "", altText: media?.altText, filename: media?.filename ?? "" });
 });
 

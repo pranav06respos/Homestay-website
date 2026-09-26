@@ -2,6 +2,7 @@ import React from 'react';
 import { useListRooms, resolveMediaUrl } from '@workspace/api-client-react';
 import { Link } from 'wouter';
 import { Wind, Users, BedDouble } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 const CACHE_ROOMS_KEY = 'nkh_cached_rooms';
 
@@ -111,14 +112,13 @@ export default function Rooms() {
               <div key={room.id} className={`flex flex-col gap-8 md:gap-14 ${index % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
                 <div className="w-full md:w-[55%] aspect-[4/3] bg-muted relative overflow-hidden rounded-2xl group shadow-sm">
                   {room.coverImageUrl ? (
-                    <img 
-                      src={resolveMediaUrl(room.coverImageUrl)} 
+                    <OptimizedImage 
+                      src={room.coverImageUrl} 
                       alt={room.name} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80";
-                      }}
+                      width={800}
+                      quality={80}
+                      fallbackSrc="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"
                     />
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/50 bg-card">

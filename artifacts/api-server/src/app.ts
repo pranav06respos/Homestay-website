@@ -124,13 +124,79 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session middleware removed – JWT auth used instead
 
-// Serve uploaded files statically
+// Lightweight built-in gzip compression middleware for API JSON responses
+import zlib from "zlib";
+app.use((req, res, next) => {
+  const acceptEncoding = (req.headers["accept-encoding"] as string) || "";
+  if (!acceptEncoding.includes("gzip") || req.url.startsWith("/api/uploads/")) {
+    return next();
+  }
+
+  const originalSend = res.send;
+  res.send = function (body: any) {
+    if (res.headersSent) return originalSend.call(this, body);
+
+    const contentType = String(res.getHeader("Content-Type") || "");
+    const isCompressible = contentType.includes("json") || contentType.includes("text");
+
+    if (!isCompressible || !body) {
+      return originalSend.call(this, body);
+    }
+
+    const payload = Buffer.isBuffer(body)
+      ? body
+      : Buffer.from(typeof body === "string" ? body : JSON.stringify(body));
+
+    if (payload.length < 1024) {
+      return originalSend.call(this, body);
+    }
+
+    zlib.gzip(payload, (err, compressed) => {
+      if (err) {
+        return originalSend.call(this, body);
+      }
+      res.setHeader("Content-Encoding", "gzip");
+      res.setHeader("Content-Length", compressed.length);
+      return originalSend.call(this, compressed);
+    });
+    return res;
+  };
+  next();
+});
+
+// Serve uploaded files statically with aggressive immutable caching
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
-app.use("/api/uploads", express.static(UPLOADS_DIR));
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+app.use(
+  "/api/uploads",
+  express.static(UPLOADS_DIR, {
+    maxAge: "365d",
+    immutable: true,
+    lastModified: true,
+    etag: true,
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+    },
+  })
+);
 
 // Retrieve uploaded files from local disk or reconstitute from PostgreSQL database store
 app.get("/api/uploads/:filename", async (req, res): Promise<void> => {
   const filename = req.params.filename;
+
+  // Fast-path: Check if file already exists on local disk
+  const filePath = path.join(UPLOADS_DIR, filename);
+  if (fs.existsSync(filePath)) {
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.sendFile(filePath);
+    return;
+  }
+
   const distinctPhotos = [
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
     "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
@@ -147,16 +213,18 @@ app.get("/api/uploads/:filename", async (req, res): Promise<void> => {
     if (media && media.data) {
       const buffer = Buffer.from(media.data, "base64");
       // Cache file back to local disk
-      const filePath = path.join(UPLOADS_DIR, filename);
       if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
       fs.writeFileSync(filePath, buffer);
 
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.setHeader("Access-Control-Allow-Origin", "*");
       res.contentType(media.mimeType).send(buffer);
       return;
     }
 
     if (media) {
       const photoUrl = distinctPhotos[media.id % distinctPhotos.length];
+      res.setHeader("Cache-Control", "public, max-age=86400");
       res.redirect(302, photoUrl);
       return;
     }
@@ -169,6 +237,7 @@ app.get("/api/uploads/:filename", async (req, res): Promise<void> => {
   for (let i = 0; i < filename.length; i++) {
     hash = (hash + filename.charCodeAt(i)) % distinctPhotos.length;
   }
+  res.setHeader("Cache-Control", "public, max-age=86400");
   res.redirect(302, distinctPhotos[hash]);
 });
 

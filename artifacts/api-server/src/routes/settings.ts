@@ -7,6 +7,15 @@ import { requireAdminJwt } from "../middlewares/jwtAuth";
 
 const router: IRouter = Router();
 
+let cachedPublishedSettings: any = null;
+let lastSettingsFetch = 0;
+const SETTINGS_CACHE_TTL = 60 * 1000; // 60 seconds
+
+export function invalidateSettingsCache() {
+  cachedPublishedSettings = null;
+  lastSettingsFetch = 0;
+}
+
 function normalizeMediaUrl(url: string | null): string | null {
   if (!url) return null;
   try {
@@ -54,10 +63,21 @@ async function ensureSettings() {
 }
 
 router.get("/settings", async (req, res): Promise<void> => {
+  const now = Date.now();
+  if (cachedPublishedSettings && now - lastSettingsFetch < SETTINGS_CACHE_TTL) {
+    res.setHeader("X-Cache", "HIT");
+    res.json(cachedPublishedSettings);
+    return;
+  }
+
   try {
     await ensureSettings();
     const [settings] = await db.select().from(settingsTable).where(eq(settingsTable.isDraft, false));
-    res.json(await withResolvedMediaUrls(settings));
+    const resolved = await withResolvedMediaUrls(settings);
+    cachedPublishedSettings = resolved;
+    lastSettingsFetch = now;
+    res.setHeader("X-Cache", "MISS");
+    res.json(resolved);
   } catch (err: any) {
     console.error("[settings GET] DB error:", err);
     const cause = err?.cause || {};
@@ -162,6 +182,7 @@ router.post("/settings/publish", requireAdminJwt, async (req, res): Promise<void
       .where(eq(settingsTable.isDraft, false))
       .returning();
 
+    invalidateSettingsCache();
     res.json(published);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

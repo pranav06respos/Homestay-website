@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGetSettings, resolveMediaUrl } from '@workspace/api-client-react';
 import { Clock, Ban, Info } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function About() {
   const { data: settings } = useGetSettings();
@@ -16,13 +17,14 @@ export default function About() {
           </h1>
           {settings?.aboutImageUrl && (
             <div className="aspect-[21/9] bg-muted mb-12 rounded-sm overflow-hidden">
-              <img 
-                src={resolveMediaUrl(settings.aboutImageUrl)} 
+              <OptimizedImage 
+                src={settings.aboutImageUrl} 
                 alt="Neel Kamal Homestay Property" 
                 className="w-full h-full object-cover" 
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80";
-                }}
+                width={1200}
+                quality={82}
+                priority={true}
+                fallbackSrc="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
               />
             </div>
           )}

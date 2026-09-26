@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'wouter';
 import { useListRooms, useListRoomImages, resolveMediaUrl } from '@workspace/api-client-react';
 import { Users, BedDouble, Wind, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export default function RoomDetail() {
   const { slug } = useParams();
@@ -100,13 +101,14 @@ export default function RoomDetail() {
           <div className="relative aspect-[16/9] md:aspect-[21/9] bg-card rounded-sm overflow-hidden group">
             {displayImages.length > 0 ? (
               <>
-                <img 
-                  src={resolveMediaUrl(displayImages[currentImageIdx].url)} 
+                <OptimizedImage 
+                  src={displayImages[currentImageIdx].url} 
                   alt={room.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80";
-                  }}
+                  priority={true}
+                  width={1400}
+                  quality={82}
+                  fallbackSrc="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80"
                 />
                 {displayImages.length > 1 && (
                   <>

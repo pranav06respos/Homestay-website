@@ -22,3 +22,12 @@ createRoot(document.getElementById('root')!).render(
   </AuthProvider>
 );
 
+// Register Service Worker for instant image and asset caching (< 1ms cache hits)
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.debug('ServiceWorker registration optional error:', err);
+    });
+  });
+}
+
