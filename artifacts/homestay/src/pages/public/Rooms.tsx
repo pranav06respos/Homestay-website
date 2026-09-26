@@ -8,43 +8,69 @@ const CACHE_ROOMS_KEY = 'nkh_cached_rooms';
 
 const defaultFallbackRooms = [
   {
-    id: 1,
-    name: 'Valley View Deluxe Room',
-    slug: 'valley-view-deluxe',
-    shortDescription: 'Spacious retreat overlooking lush pine valleys with panoramic Himalayan views.',
-    pricePerNight: 3500,
-    maxGuests: 3,
+    id: 9,
+    name: 'Room 1',
+    slug: 'room-9',
+    shortDescription: '1 bedroom accommodates 2 people with serene mountain views.',
+    pricePerNight: null,
+    maxGuests: 2,
     bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
-    amenities: ['Valley View', 'Private Balcony', 'High-Speed WiFi', 'Hot Shower', 'Electric Kettle'],
+    coverImageUrl: '/images/room-1.webp',
+    amenities: ['Mountain View', 'High-Speed WiFi', 'Hot Water', 'Room Service'],
   },
   {
-    id: 2,
-    name: 'Mountain Sunrise Suite',
-    slug: 'mountain-sunrise-suite',
-    shortDescription: 'Wake up to golden Himalayan morning light, wooden warm decor, and fresh mountain air.',
-    pricePerNight: 4200,
-    maxGuests: 4,
-    bedType: 'King Bed + Sofa',
+    id: 7,
+    name: 'Room 2',
+    slug: 'room-2',
+    shortDescription: '1 bedroom accommodates 3 people with mountain decor.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80',
-    amenities: ['Sunrise View', 'King Bed', 'Sitting Area', 'High-Speed WiFi', 'Tea & Coffee Maker'],
+    coverImageUrl: '/images/room-2.webp',
+    amenities: ['Valley View', 'King Bed', 'High-Speed WiFi', 'Heater'],
   },
   {
-    id: 3,
-    name: 'Pine Forest Family Suite',
-    slug: 'pine-forest-family',
-    shortDescription: 'Thoughtfully appointed family suite surrounded by serene pine trees and private sitting space.',
-    pricePerNight: 4800,
-    maxGuests: 4,
-    bedType: '2 Queen Beds',
+    id: 11,
+    name: 'Room 3',
+    slug: 'room-3',
+    shortDescription: 'Serene mountain retreat with wooden warmth.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
-    amenities: ['Pine Forest View', '2 Queen Beds', 'Spacious Living', 'High-Speed WiFi', 'Work Desk'],
+    coverImageUrl: '/images/room-3.webp',
+    amenities: ['Forest View', 'Peaceful Ambiance', 'High-Speed WiFi'],
+  },
+  {
+    id: 12,
+    name: 'Room 4',
+    slug: 'room-4',
+    shortDescription: 'Cozy and spacious hill retreat for deep rest.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
+    isVisible: true,
+    isAvailable: true,
+    coverImageUrl: '/images/room-4.webp',
+    amenities: ['Valley View', 'Private Space', 'Hot Water'],
+  },
+  {
+    id: 13,
+    name: 'Room 5',
+    slug: 'room-5',
+    shortDescription: 'Panoramic upper-level view suite.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
+    isVisible: true,
+    isAvailable: true,
+    coverImageUrl: '/images/room-5.webp',
+    amenities: ['Sunrise View', 'Balcony', 'Room Service'],
   },
 ];
 
@@ -54,9 +80,9 @@ export default function Rooms() {
   const [cachedRooms, setCachedRooms] = React.useState<any[]>(() => {
     try {
       const raw = localStorage.getItem(CACHE_ROOMS_KEY);
-      return raw ? JSON.parse(raw) : [];
+      return raw ? JSON.parse(raw) : defaultFallbackRooms;
     } catch {
-      return [];
+      return defaultFallbackRooms;
     }
   });
 

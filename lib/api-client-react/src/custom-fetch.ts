@@ -76,6 +76,24 @@ export function resolveMediaUrl(
     return rawUrl;
   }
 
+  // Pre-bundled static WebP images hosted on Cloudflare Pages for instant zero-delay first-time load
+  // and 100% offload from backend server
+  const BUNDLED_STATIC_IMAGES: Record<string, string> = {
+    'a8411cf1784e62f6': '/images/hero.webp',
+    'f09cbc6160f14e4c': '/images/about.webp',
+    'adb92ebf17bc080c': '/images/room-1.webp',
+    '86ca5d128045d249': '/images/room-2.webp',
+    'ab81af898863b607': '/images/room-3.webp',
+    '024650a599d398d3': '/images/room-4.webp',
+    'eade8986674e410b': '/images/room-5.webp',
+  };
+
+  for (const [hash, bundledPath] of Object.entries(BUNDLED_STATIC_IMAGES)) {
+    if (rawUrl.includes(hash)) {
+      return bundledPath;
+    }
+  }
+
   // Already optimized via wsrv.nl
   if (rawUrl.includes('wsrv.nl')) return rawUrl;
 
@@ -83,7 +101,7 @@ export function resolveMediaUrl(
   const quality = options.quality ?? 80;
   const format = options.format ?? 'webp';
 
-  // Cloudflare-backed Global Edge Image CDN for uploaded backend media
+  // Cloudflare-backed Global Edge Image CDN for newly uploaded backend media
   if (rawUrl.includes('/api/uploads/') || rawUrl.includes('onrender.com/api/uploads/')) {
     const cleanUrl = rawUrl.replace(/^https?:\/\//, '');
     const wParam = width ? `&w=${width}` : '&w=1200';

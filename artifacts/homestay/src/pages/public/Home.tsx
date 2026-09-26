@@ -8,42 +8,51 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 const CACHE_SETTINGS_KEY = 'nkh_cached_settings';
 const CACHE_ROOMS_KEY = 'nkh_cached_rooms';
 
+const defaultInitialSettings = {
+  heroHeading: 'Silence in the High Himalayas',
+  heroSubheading: 'Peaceful Mountain Retreat',
+  heroImageUrl: '/images/hero.webp',
+  aboutHeading: 'Our Story',
+  aboutText: 'Neel Kamal Homestay is a lovingly crafted mountain retreat in Village Mashobra, just minutes from the heart of Kasauli. Surrounded by ancient deodar and pine forests, our homestay offers an intimate escape from city life — where the mornings smell of pine resin and the evenings are lit by a million stars.',
+  aboutImageUrl: '/images/about.webp',
+};
+
 const defaultFallbackRooms = [
   {
-    id: 1,
-    name: 'Valley View Deluxe Room',
-    slug: 'valley-view-deluxe',
-    shortDescription: 'Spacious retreat overlooking lush pine valleys with panoramic Himalayan views.',
-    pricePerNight: 3500,
-    maxGuests: 3,
+    id: 9,
+    name: 'Room 1',
+    slug: 'room-9',
+    shortDescription: '1 bedroom accommodates 2 people with serene mountain views.',
+    pricePerNight: null,
+    maxGuests: 2,
     bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
+    coverImageUrl: '/images/room-1.webp',
   },
   {
-    id: 2,
-    name: 'Mountain Sunrise Suite',
-    slug: 'mountain-sunrise-suite',
-    shortDescription: 'Wake up to golden Himalayan morning light, wooden warm decor, and fresh mountain air.',
-    pricePerNight: 4200,
-    maxGuests: 4,
-    bedType: 'King Bed + Sofa',
+    id: 7,
+    name: 'Room 2',
+    slug: 'room-2',
+    shortDescription: '1 bedroom accommodates 3 people with mountain decor.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80',
+    coverImageUrl: '/images/room-2.webp',
   },
   {
-    id: 3,
-    name: 'Pine Forest Family Suite',
-    slug: 'pine-forest-family',
-    shortDescription: 'Thoughtfully appointed family suite surrounded by serene pine trees and private sitting space.',
-    pricePerNight: 4800,
-    maxGuests: 4,
-    bedType: '2 Queen Beds',
+    id: 11,
+    name: 'Room 3',
+    slug: 'room-3',
+    shortDescription: 'Serene mountain retreat with wooden warmth.',
+    pricePerNight: null,
+    maxGuests: 2,
+    bedType: 'King Bed',
     isVisible: true,
     isAvailable: true,
-    coverImageUrl: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
+    coverImageUrl: '/images/room-3.webp',
   },
 ];
 
@@ -52,22 +61,22 @@ export default function Home() {
   const { data: rooms } = useListRooms();
   const { data: reviews } = useListReviews();
 
-  // Synchronous cache hydration for instant initial render (< 2 seconds)
+  // Synchronous cache hydration for instant initial render (0 delay)
   const [cachedSettings, setCachedSettings] = React.useState<any>(() => {
     try {
       const raw = localStorage.getItem(CACHE_SETTINGS_KEY);
-      return raw ? JSON.parse(raw) : null;
+      return raw ? JSON.parse(raw) : defaultInitialSettings;
     } catch {
-      return null;
+      return defaultInitialSettings;
     }
   });
 
   const [cachedRooms, setCachedRooms] = React.useState<any[]>(() => {
     try {
       const raw = localStorage.getItem(CACHE_ROOMS_KEY);
-      return raw ? JSON.parse(raw) : [];
+      return raw ? JSON.parse(raw) : defaultFallbackRooms;
     } catch {
-      return [];
+      return defaultFallbackRooms;
     }
   });
 
@@ -89,8 +98,8 @@ export default function Home() {
     }
   }, [rooms]);
 
-  const activeSettings = settings || cachedSettings;
-  const activeRooms = (rooms && rooms.length > 0) ? rooms : (cachedRooms.length > 0 ? cachedRooms : defaultFallbackRooms);
+  const activeSettings = settings || cachedSettings || defaultInitialSettings;
+  const activeRooms = (rooms && rooms.length > 0) ? rooms : (cachedRooms && cachedRooms.length > 0 ? cachedRooms : defaultFallbackRooms);
 
   const [reviewStart, setReviewStart] = React.useState(0);
 
